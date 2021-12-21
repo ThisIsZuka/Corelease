@@ -1,0 +1,6 @@
+.accordion-button:focus {
+    z-index: 1;
+    border-color: #ffffff;
+    outline: 0;
+    box-shadow: 0 0 0 0rem rgb(249 249 249 / 25%);
+}

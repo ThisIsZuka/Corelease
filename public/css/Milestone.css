@@ -1,0 +1,55 @@
+.centered {
+    position: fixed;
+    top: 40%;
+    left: 50%;
+    /* bring your own prefixes */
+    transform: translate(-50%, -50%);
+}
+
+.dot {
+    height: 100px;
+    width: 100px;
+    background-color: #ffffff;
+    border-radius: 50%;
+    display: inline-block;
+    border: 1px solid #000000;
+}
+
+i.fas {
+    display: inline-block;
+    border-radius: 100%;
+    box-shadow: 0px 0px 2px #888;
+    padding: 0.6em 0.6em;
+
+}
+
+.circle_margin {
+    text-align: center !important;
+    /* margin-left: 10px;
+    margin-right: 10px; */
+}
+
+
+.button-corner {
+    position: fixed;
+    bottom: 5%;
+    left: 5%;
+}
+
+@media only screen and (max-width: 1000px) {
+    .fa-4x {
+        font-size: 3em;
+    }
+    .progress {
+        height: 1.5rem;
+    }
+    .img_step{
+        width: 5rem !important;
+    }
+}
+
+@media only screen and (max-width: 500px) {
+    .group_circle {
+        display: block;
+    }
+}
