@@ -109,13 +109,18 @@ class PageCustomer_Controller extends BaseController
             $return_data = new \stdClass();
 
             $data = $request->all();
-
+            $return_data->PDF_Base64 = [];
             // Get PDF
             $PDF = DB::table('dbo.PDF_FORM')
                 ->select('PDF_NAME')
                 ->where('INVOICE_ID', $data['PDF_ID'])
                 ->get();
-            $return_data->PDF_Base64 = $PDF;
+            // dd($PDF);
+            if(count($PDF) != 0){
+                if ($PDF[0]->PDF_NAME != null) {
+                    $return_data->PDF_Base64 = $PDF;
+                }
+            }
 
             if (count($return_data->PDF_Base64) == 0) {
                 $APPLICATION = DB::table('dbo.APPLICATION')

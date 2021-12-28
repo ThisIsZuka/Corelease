@@ -45,8 +45,8 @@
         <div class="loading" style="display: none">Loading&#8230;</div>
 
         <div>
-            <img src="{{ asset('images/UFUND.png') }}" alt="" style="width: 15%; margin-bottom: 5%; cursor: pointer;"
-                id="icon_ufond" onclick="window.location = '{{ url('/') }}'">
+            <img src="{{ asset('images/UFUND.png') }}" alt="" style="width: 15%; cursor: pointer;" id="icon_ufond"
+                onclick="window.location = '{{ url('/') }}'">
         </div>
 
         <div class="row mt-3" style="font-size: 1.1rem;">
@@ -188,13 +188,14 @@
             </div>
         </div>
 
-        {{-- <div class="text-center mt-3" style="margin-bottom: 10%">
+        <a href="javascript:;" id="testAnchor">
+            {{-- <div class="text-center mt-3" style="margin-bottom: 10%">
             <button type="button" id="btn_calcu" class="btn btn-outline-dark" style="border-radius: 2rem;"> คํานวนยอดปิด
             </button>
         </div> --}}
 
 
-        {{-- <div>
+            {{-- <div>
             <div class="button-corner" title="คำถามที่พบบ่อย" style="cursor: pointer;" id="btn_faq">
                 <img src="{{ asset('images/FAQ.png') }}" alt="" style="width: 15%;">
             </div>
@@ -590,7 +591,7 @@
                         'Accept': 'application/pdf'
                     },
                 }).then(function(response) {
-                    // console.log(response.data.PDF_INVOICE[0]['PDF_NAME']);
+                    // console.log(response.data.PDF_Base64);
                     if (response.data.PDF_Base64.length != 0) {
                         openDoc(response.data.PDF_Base64[0]['PDF_NAME'])
                     } else if (response.data.URL_APP) {
@@ -718,7 +719,17 @@
                     type: "application/pdf"
                 });
                 var url = URL.createObjectURL(blob);
-                window.location = url;
+                // window.location = url;
+                var new_tab = window.open([url]);
+
+                if (new_tab == undefined) {
+
+                    var newload = (window.location.href = [url]);
+
+                    if (newload == undefined) {
+                        alert('Please disable your popup blocker');
+                    }
+                }
             } else {
                 downloadLink.click();
             }
@@ -778,8 +789,21 @@
             ]
 
 
-            var URL = list_url.find(x => x.type === type).url
-            window.open(URL)
+            var URL_K2 = list_url.find(x => x.type === type).url
+            // window.open(URL_K2)
+            // window.location.href = URL_K2
+            var new_tab = window.open([URL_K2]);
+
+            if (new_tab == undefined) {
+
+                var newload = (window.location.href = [URL_K2]);
+
+                if (newload == undefined) {
+                    alert('Please disable your popup Blocker');
+                }
+            }
+
+
             $(".loading").css("display", "none");
         }
 

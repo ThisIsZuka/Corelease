@@ -47,8 +47,9 @@
         <div class="loading" style="display: none">Loading&#8230;</div>
 
         <div>
-            <img src="{{ asset('images/UFUND.png') }}" alt="" style="width: 15%; margin-bottom: 5%; cursor: pointer;" id="icon_ufond" onclick="window.location = '{{ url('/') }}'">
+            <img src="{{ asset('images/UFUND.png') }}" alt="" style="width: 15%; cursor: pointer;" id="icon_ufond" onclick="window.location = '{{ url('/') }}'">
         </div>
+
 
         <div class="row mt-3">
             {{-- <div class="col-lg-4 col-md-8 col-sm-12">

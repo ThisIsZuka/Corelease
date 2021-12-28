@@ -45,11 +45,13 @@
 
         <div class="loading" style="display: none">Loading&#8230;</div>
 
-        <div>
-            <img src="{{ asset('images/UFUND.png') }}" alt="" style="width: 15%;" id="icon_ufond">
-        </div>
+        
 
         <form class="centered">
+
+            <div class="text-center mb-4">
+                <img src="{{ asset('images/UFUND.png') }}" alt="" id="icon_ufond_login">
+            </div>
             {{-- <div class="mb-3">
                 <label for="id_card" class="form-label collectes-ville text-center"> กรุณากรอกเลขที่บัตรประชาชน </label>
                 <input type="email" class="form-control" id="id_card" aria-describedby="idHelp" placeholder="Search"
