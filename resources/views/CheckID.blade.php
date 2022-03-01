@@ -45,12 +45,13 @@
 
         <div class="loading" style="display: none">Loading&#8230;</div>
 
-        
+
 
         <form class="centered">
 
             <div class="text-center mb-4">
                 <img src="{{ asset('images/UFUND.png') }}" alt="" id="icon_ufond_login">
+                {{-- <h1>UAT</h1> --}}
             </div>
             {{-- <div class="mb-3">
                 <label for="id_card" class="form-label collectes-ville text-center"> กรุณากรอกเลขที่บัตรประชาชน </label>
@@ -472,7 +473,10 @@
                             actionTextColor: '#dc3545',
                             backgroundColor: '#323232',
                             width: 'auto',
-                            text: 'SYSTEM ERROR'
+                            text: 'SYSTEM ERROR',
+                            onClose: function() {
+                                location.reload();
+                            }
                         });
                     }
                     $(".loading").css("display", "none");
@@ -485,7 +489,10 @@
                         actionTextColor: '#dc3545',
                         backgroundColor: '#323232',
                         width: 'auto',
-                        text: 'SYSTEM ERROR'
+                        text: 'SYSTEM ERROR',
+                        onClose: function() {
+                            location.reload();
+                        }
                     });
                 });
         }

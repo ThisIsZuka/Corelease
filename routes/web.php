@@ -70,3 +70,9 @@ Route::post('/TEST_API', [PageCustomer_Controller::class, 'TEST_API']);
 
 
 
+// Google Domain Verification
+Route::get('/google18d482a4643299fb.html', function () {
+    return view('google18d482a4643299fb');
+});
+
+

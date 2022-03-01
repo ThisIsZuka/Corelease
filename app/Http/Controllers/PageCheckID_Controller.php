@@ -64,7 +64,7 @@ class PageCheckID_Controller extends BaseController
             if (!$Check_Bdate->isEmpty()) {
                 $DataBdate = $Check_Bdate[0]->BIRTHDAY;
                 $str_BDATE = $this->SubSRT($DataBdate);
-                // dd($Check_Bdate);
+                // dd($str_BDATE);
                 if ($str_BDATE == $data['b_date']) {
                     $CS = DB::table('dbo.QUOTATION')
                         ->select('TAX_ID', 'QUOTATION_ID', 'CUSTOMER_NAME')
@@ -79,6 +79,7 @@ class PageCheckID_Controller extends BaseController
                         ])
                         ->orderBy('QUOTATION_ID', 'DESC')
                         ->get();
+                    // dd($CS);
                     $num = count($CS);
                     if ($num != 0) {
                         $CK_APP = [];
@@ -111,8 +112,8 @@ class PageCheckID_Controller extends BaseController
                                 //     ['CONTRACT.STATUS_ID', '!=', '54'],
                                 // ])
                                 ->get();
-
-                            $num_Check_contract = 0;
+                            // dd($PD);
+                            $num_Check_contract = 0;        
                             if (!$PD->isEmpty()) {
                                 $Check_contract = DB::table('dbo.CONTRACT')
                                     ->select('APP_ID', 'STATUS_ID')
@@ -128,10 +129,10 @@ class PageCheckID_Controller extends BaseController
                                     ->get();
                                 $num_Check_contract = count($Check_contract);
                             }
-
-
+                            // dd($num_Check_contract);
+                            
                             if (!$PD->isEmpty()  && $PD[0]->CHECKER_RESULT != 'Reject') {
-                                if ($num_Check_contract == 0) {
+                                if($num_Check_contract == 0){
                                     array_push($CK_APP, ['APP_ID' => $PD[0]->APP_ID, 'CHECKER_RESULT' => $PD[0]->CHECKER_RESULT]);
                                 }
                             }
@@ -201,7 +202,7 @@ class PageCheckID_Controller extends BaseController
                             // $return_data = $CK_APP[0];
                         }
                     }
-                    // dd($CS);
+                    // dd($return_data);
                     // dd('ff');
                     if ((count((array)$return_data)) != 0) {
                         return $return_data;
@@ -224,88 +225,6 @@ class PageCheckID_Controller extends BaseController
             } else {
                 return 'NoData';
             }
-        } catch (Exception $e) {
-            return response()->json(array('message' => $e->getMessage()));
-        }
-    }
-
-    public function LOG_Login(Request $request)
-    {
-        try {
-            $data = $request->all();
-            $return_data = new \stdClass();
-
-            $IP = $data['device_info']['IP'];
-            $OS_Name = $data['device_info']['OS_Name'];
-            $OS_Version = $data['device_info']['OS_Version'];
-            $Browser = $data['device_info']['browser'];
-
-            $TAX_ID = $data['data_login']['id_card'];
-            $B_Date = $data['data_login']['b_date'];
-
-            $APP_ID = null;
-            $QUOTATION_ID = null;
-
-            $PROSPEC_ID = null;
-            $ADDRESS_ID = null;
-            $ADDRESS_PROSPEC_ID = null;
-            $PRODUCT_ID = null;
-            $PERSON_ID = null;
-            $CONTRACT_ID = null;
-
-            if (isset($data['data']['QUOTATION_ID'])) {
-                $QUOTATION_ID = $data['data']['QUOTATION_ID'];
-
-                $PROSPEC = DB::table('dbo.PROSPECT_CUSTOMER')
-                    ->select('PROSPECT_CUSTOMER.PST_CUST_ID',)
-                    ->where('PROSPECT_CUSTOMER.QUOTATION_ID', $QUOTATION_ID)
-                    ->get();
-                $PROSPEC_ID = sizeof($PROSPEC) != 0 ?  $PROSPEC[0]->PST_CUST_ID : null;
-
-
-                $ADDRESS_PROSPEC = DB::table('dbo.ADDRESS_PROSPECT_CUSTOMER')
-                    ->select('ADD_CUST_ID',)
-                    ->where('QUOTATION_ID', $QUOTATION_ID)
-                    ->get();
-                $ADDRESS_PROSPEC_ID = sizeof($ADDRESS_PROSPEC) != 0 ?  $ADDRESS_PROSPEC[0]->ADD_CUST_ID : null;
-            }
-
-            if (isset($data['data']['APP_ID'])) {
-                $APP_ID = $data['data']['APP_ID'];
-
-                $PERSON = DB::table('dbo.PERSON')
-                    ->select('PERSON_ID')
-                    ->where('APP_ID', $APP_ID)
-                    ->get();
-                $PERSON_ID = sizeof($PERSON) != 0 ?  $PERSON[0]->PERSON_ID : null;
-
-
-                $ADDRESS = DB::table('dbo.ADDRESS')
-                    ->select('ADDRESS_ID')
-                    ->where('PERSON_ID', $PERSON_ID)
-                    ->get();
-                $ADDRESS_ID = sizeof($ADDRESS) != 0 ?  $ADDRESS[0]->ADDRESS_ID : null;
-
-
-                $PRODUCT = DB::table('dbo.PRODUCT')
-                    ->select('PRODUCT_ID')
-                    ->where('APP_ID', $APP_ID)
-                    ->get();
-                $PRODUCT_ID = sizeof($PRODUCT) != 0 ?  $PRODUCT[0]->PRODUCT_ID : null;
-
-                $PRODUCT = DB::table('dbo.PRODUCT')
-                    ->select('PRODUCT_ID')
-                    ->where('APP_ID', $APP_ID)
-                    ->get();
-                $PRODUCT_ID = sizeof($PRODUCT) != 0 ?  $PRODUCT[0]->PRODUCT_ID : null;
-                // dd($PRODUCT_ID);
-            }
-
-            $return_data->code = '99999';
-            $return_data->message = 'Success';
-            
-            return $return_data;
-            // dd($ADDRESS_ID);
         } catch (Exception $e) {
             return response()->json(array('message' => $e->getMessage()));
         }

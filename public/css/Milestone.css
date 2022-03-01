@@ -36,6 +36,10 @@ i.fas {
     left: 5%;
 }
 
+.fs-7{
+    font-size: 0.85rem;
+}
+
 @media only screen and (max-width: 1000px) {
     .fa-4x {
         font-size: 3em;

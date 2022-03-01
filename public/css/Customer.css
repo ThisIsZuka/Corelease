@@ -3,3 +3,23 @@
     bottom: 5%;
     left: 5%;
   }
+
+
+
+  @media only screen and (max-width: 762px) {
+    .body_card_customer{
+      font-size: 0.9rem;
+    }
+
+    .footer_card_customer{
+      font-size: 0.9rem;
+    }
+
+    .table_customer{
+      font-size: 0.9rem;
+    }
+
+    .text_header_table{
+      font-size: 1.5rem !important;
+    }
+}

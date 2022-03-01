@@ -46,8 +46,15 @@
 
         <div class="loading" style="display: none">Loading&#8230;</div>
 
-        <div>
-            <img src="{{ asset('images/UFUND.png') }}" alt="" style="width: 15%; cursor: pointer;" id="icon_ufond" onclick="window.location = '{{ url('/') }}'">
+        <div class="row">
+            <div class="col text-start">
+                <img src="{{ asset('images/UFUND.png') }}" alt="" style="width: 30%; cursor: pointer;"
+                    id="icon_ufond" onclick="window.location = '{{ url('/') }}'">
+                {{-- <h1>UAT</h1> --}}
+            </div>
+            <div class="col text-end align-self-center">
+                <button type="button" id="logout" class="btn btn-sm btn-danger">ออกจากระบบ</button>
+            </div>
         </div>
 
 
@@ -128,6 +135,7 @@
                         กรุณาติดต่อสาขา <span id="Company"></span>
                         <br>
                         แจ้งรหัส Approve Code : <u><span id="Approve_Code"></span></u> กับเจ้าหน้าที่
+
                         <br><br>
                         หากมีข้อสงสัย <span style="">@Line</span> : <span style="color:#25e425">@ufund</span>
                     </div>
@@ -135,10 +143,52 @@
                     <div class="col-sm-12 col-md-6 col-lg-6" id="col_etc_rework" style="display: none;color:red">
                         * การขออนุมัติของท่านอยู่ในสถานะ Rework เนื่องจาก
                         <br>
-                        <div id="list_etc"></div>
+                        <div id="list_etc_rework"></div>
+                    </div>
+                </div>
+                <div class="d-none" id="div_guar">
+                    <hr>
+                    <div class="d-none" id="div_url_guar">
+                        ลิงค์กรอกข้อมูล "<span class="font-weight-bold"><u> ผู้ค้ำประกัน </u></span>"
+                        <br>
+                        <span id="url_guar"></span>
+                        <hr>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-lg-4 col-md-4 col-sm-12 mt-1">
+                            <div class="card">
+                                <div class="card-body">
+                                    <p class="fs-7 text-muted mb-0">ข้อมูลผู้ค้ำประกัน</p>
+                                    <p class="text-center fs-5 mb-0" id="Gurantor_ACTIVE"></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-4 col-sm-12 mt-1">
+                            <div class="card">
+                                <div class="card-body">
+                                    <p class="fs-7 text-muted mb-0">สถานะการยินยอมค้ำประกัน</p>
+                                    <p class="text-center fs-5 mb-0" id="Gurantor_ACCEPT"></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-4 col-sm-12 mt-1">
+                            <div class="card">
+                                <div class="card-body">
+                                    <p class="fs-7 text-muted mb-0">ผลการตรวจสอบสถานะผู้ค้ำประกันเบื้องต้น</p>
+                                    <p class="text-center fs-5 mb-0" id="Gurantor_RESULT"></p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
+            {{-- <span class="d-none" id="div_guar">
+                <br><br>
+                ลิงค์กรอกข้อมูล "<span class="font-weight-bold"><u> ผู้ค้ำประกัน </u></span>"
+                <br>
+                <span id="url_guar"></span>
+            </span> --}}
             <div class="card-footer text-center text-muted" style="font-size: 0.9rem;">
                 U-FUND ผ่อนง่ายไม่ต้องใช้บัตรเครดิต
             </div>
@@ -233,6 +283,12 @@
             invocation();
         });
 
+        function numberWithCommas(x) {
+            var parts = x.toString().split(".");
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            return parts.join(".");
+        }
+
         var token = document.head.querySelector('meta[name="csrf-token"]');
         window.axios.defaults.headers.common['X-CSRF-TOKEN'] = token.content;
 
@@ -272,6 +328,7 @@
                         Cookies.set('APP_ID', response.data['APP_ID']);
                     }
 
+
                     if (response.data['QR_Down']) {
                         var txt = response.data['QR_Down']['SEND_MSG'];
                         var html = urlify(txt);
@@ -285,10 +342,67 @@
                         $('#text_contract').css('display', 'block');
                     }
 
+
+                    /////////////////////////// Guarantor /////////////////////////////////////////////////
+                    if (response.data['Guarantor'].count == 1) {
+
+                        $('#div_url_guar').removeClass('d-none');
+
+                        let url = null;
+
+                        if(response.data['Guarantor'].QT_NOTPASS == 1){
+                            url = 'https://ufund.comseven.com/Runtime/Runtime/Form/Form.GuarantorPreInfo/?PST_GUAR_ID=' + response.data['Guarantor'].PST_GUAR_ID + '&STATE=CHANGEQUO'
+                        }else{
+                            url =  'https://ufund.comseven.com/Runtime/Runtime/Form/Form.GuarantorAuthen/?QUATATION_ID=' + response.data['Guarantor'].QUOTATION_ID + '&PST_GUAR_ID=' + response.data[ 'Guarantor'].PST_GUAR_ID
+                        }
+
+                        if(response.data['Guarantor'].url_accept_guarantor == 1){
+                            url =  'https://ufund.comseven.com/Runtime/Runtime/Form/Form.GuarantorAuthen/?QUATATION_ID=' + response.data['Guarantor'].QUOTATION_ID + '&PST_GUAR_ID=' + response.data[ 'Guarantor'].PST_GUAR_ID
+                        }
+                        
+                        $('#url_guar').html('<a href="' + url + '" target="blank"> ' + url + ' </a>');
+                    }
+
+                    if (response.data['Guarantor'].Guarantor_Result) {
+
+                        $('#div_guar').removeClass('d-none');
+
+                        if (response.data['Guarantor'].Guarantor_Result['FLAG_GUARANTOR'] == 1) {
+
+                            $('#Gurantor_ACTIVE').html('<span class="text-success">มีผู้ค้ำประกัน</span>')
+
+                            $txt_Gurantor_ACCEPT = response.data['Guarantor'].Guarantor_Result['ACCEPT_STATUS'];
+                            $txt_Gurantor_RESULT = response.data['Guarantor'].Guarantor_Result['RESULT_GUARANTOR'];
+
+                            $RESULT_obj = [{
+                                    id: 'WAIT',
+                                    color: 'text-warning',
+                                },
+                                {
+                                    id: 'PASS',
+                                    color: 'text-success',
+                                },
+                                {
+                                    id: 'NOTPASS',
+                                    color: 'text-danger',
+                                },
+                            ]
+                            // console.log($RESULT_obj.filter(x => x.id == $txt_Gurantor_RESULT)[0].color)
+                            $('#Gurantor_ACCEPT').html($txt_Gurantor_ACCEPT == 1 ? '<span class="text-success">ยินยอม</span>' : ($txt_Gurantor_ACCEPT == 0 ? '<span class="text-danger">ไม่ยินยอม</span>' : '-'));
+                            $('#Gurantor_RESULT').html('<span class="' + $RESULT_obj.filter(x => x.id == $txt_Gurantor_RESULT)[0].color + '">' + $txt_Gurantor_RESULT +'</span>')
+                        } else {
+                            $('#Gurantor_ACTIVE').html('<span class="text-danger">ไม่มีผู้ค้ำประกัน</span>')
+                            $('#Gurantor_ACCEPT').text('-')
+                            $('#Gurantor_RESULT').text('-')
+                        }
+                    }
+                    /////////////////////////// End Guarantor /////////////////////////////////////////////////
+
+
                     if (response.data['step'] == 'StepWaitKYC') {
 
                         $('#Company').text(response.data['Company']);
-                        $('#M_Down').text(response.data['Money_Down']);
+                        $('#M_Down').text(numberWithCommas(parseFloat(response.data['Money_Down']).toFixed(2)));
                         $('#Approve_Code').text(response.data['APPROVE_CODE']);
                         $('#col_Approve').css('display', 'block');
                         $('#col_information').css('padding-right', '20px')
@@ -301,6 +415,7 @@
 
                         $('#Progress_bar').css('width', '25%');
                         $('#Progress_bar').text('25%');
+
                     } else if (response.data['step'] == 'StepWaitApprove') {
 
                         // $('#Company').text(response.data['Company']);
@@ -321,7 +436,7 @@
                         for (let i = 0; i < response.data.etc.length; i++) {
                             html += '- ' + response.data.etc[i].MEMO + '<br>';
                         }
-                        $('#list_etc').html(html)
+                        $('#list_etc_rework').html(html)
                         $('#col_etc_rework').css('display', 'block');
 
                         $('#step1').css('color', '#000000');
@@ -402,7 +517,7 @@
                 .catch(function(error) {
                     console.log(error);
                     setTimeout(function() {
-                        location.reload();
+                        // location.reload();
                     }, 5000);
                 });
         }
@@ -425,11 +540,15 @@
                 }).then(function(response) {
                     // console.log(response.data);
                     // openDoc(response.data.PDF_APP[0]['PDF_NAME'])
-                    
+
                     if (response.data.PDF_APP.length != 0) {
                         openDoc(response.data.PDF_APP[0]['PDF_NAME'])
-                    } else if(response.data.URL_APP){
-                        window.open('https://ufund.comseven.com/Runtime/Runtime/Form/Preview+Application/?APP_ID='+ response.data.URL_APP['APP_ID'] +'&PERSION_ID='+ response.data.URL_APP['PERSION_ID'] +'&PROD_ID='+ response.data.URL_APP['PROD_ID'])
+                    } else if (response.data.URL_APP) {
+                        window.open(
+                            'https://ufund.comseven.com/Runtime/Runtime/Form/Preview+Application/?APP_ID=' +
+                            response.data.URL_APP['APP_ID'] + '&PERSION_ID=' + response.data
+                            .URL_APP['PERSION_ID'] + '&PROD_ID=' + response.data.URL_APP[
+                                'PROD_ID'])
                         $(".loading").css("display", "none");
                     } else {
                         $(".loading").css("display", "none");
@@ -445,10 +564,10 @@
                     }
                 })
                 .catch(function(error) {
-                    // console.log(error);
-                    // setTimeout(function() {
-                    //     location.reload();
-                    // }, 5000);
+                    console.log(error);
+                    setTimeout(function() {
+                        location.reload();
+                    }, 5000);
                 });
         });
 
@@ -485,7 +604,7 @@
                 var url = URL.createObjectURL(blob);
                 // console.log(url
                 window.location = url;
-            }else{
+            } else {
                 downloadLink.click();
             }
 
@@ -504,5 +623,13 @@
             var url = 'FAQ';
             window.open(url, '_blank');
         });
+
+        $("#logout").on('click', function() {
+            $(".loading").css("display", "block");
+            Cookies.remove('APP_ID');
+            Cookies.remove('CUSTOMER_NAME');
+            Cookies.remove('QUOTATION_ID');
+            window.location = '{{ url('/') }}';
+        })
     })
 </script>

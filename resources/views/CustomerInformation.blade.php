@@ -44,9 +44,19 @@
 
         <div class="loading" style="display: none">Loading&#8230;</div>
 
-        <div>
+        {{-- <div>
             <img src="{{ asset('images/UFUND.png') }}" alt="" style="width: 15%; cursor: pointer;" id="icon_ufond"
                 onclick="window.location = '{{ url('/') }}'">
+        </div> --}}
+        <div class="row"> 
+            <div class="col text-start">
+                <img src="{{ asset('images/UFUND.png') }}" alt="" style="width: 30%; cursor: pointer;" id="icon_ufond"
+                    onclick="window.location = '{{ url('/') }}'">
+                {{-- <h1>UAT</h1> --}}
+            </div>
+            <div class="col text-end align-self-center">
+                <button type="button" id="logout" class="btn btn-sm btn-danger">ออกจากระบบ</button>
+            </div>
         </div>
 
         <div class="row mt-3" style="font-size: 1.1rem;">
@@ -55,7 +65,7 @@
                     <div class="card-header" style="background-color: #18aba4; font-size: 1.2rem;">
                         ข้อมูลลูกค้า
                     </div>
-                    <div class="card-body">
+                    <div class="card-body body_card_customer">
 
                         <div class="row">
                             <div class="col-sm-12 col-md-8 col-lg-9">
@@ -79,7 +89,7 @@
                             <div class="col-sm-12 col-md-4 col-lg-3 mt-3 text-center" style="display: none" id="div_QR">
                                 <a id="href_QR">
                                     <h6>คลิกเพื่อสแกนชำระเงิน</h6>
-                                    <img id="img_qrcode" src="{{ asset('images/QR_Code.png') }}" style="width: 8rem;"
+                                    <img id="img_qrcode" src="{{ asset('images/QR_Code.png') }}" style="width: 8rem; border: 2px solid red;"
                                         class="mb-1">
                                     <p id="QR_price"> </p>
                                 </a>
@@ -109,7 +119,7 @@
                         งวดละ 100 บาท และค่าติดตามทวงถามงวดละ 100 บาท
                         <br>
                     </div>
-                    <div class="card-footer">
+                    <div class="card-footer footer_card_customer"> 
                         <div class="row">
                             <div class="col-sm-12 col-md-12 col-lg-3" style="cursor: pointer;" title="ดาวน์โหลด"
                                 id="PDF_CONTRACT">
@@ -163,11 +173,11 @@
 
 
         <div class="container-sm" style="margin-bottom: 5%">
-            <div style="font-size: 1.8rem;">
+            <div style="font-size: 1.6rem;" class="text_header_table">
                 รายการใบแจ้งหนี้/การรับชําระ
             </div>
             <div class="table-responsive">
-                <table class="table table-hover text-center">
+                <table class="table table-hover text-center table_customer">
                     <thead>
                         <tr>
                             <th scope="col">งวดที่</th>
@@ -472,8 +482,8 @@
                         GET_QR_Code(REF_NO_data)
                     }
 
-                    $('#alertDate').text('[* ค่างวดของท่านประจำวันที่ ' + text_data_late +
-                        ' เกินกำหนดชำระ กรุณาชำระเงินตามกำหนด]')
+                    txtalert = '[* ค่างวดของท่านประจำวันที่ ' + text_data_late +' เกินกำหนดชำระ กรุณาชำระตามบิลเรียกเก็บ <br> และขออภัย หากท่านชำระเรียบร้อยแล้ว กรุณารอรับใบเสร็จ ภายใน 7วันทำการ ]'
+                    $('#alertDate').html(txtalert)
                     $('#Tbody').html(html);
                     // $('#Count_repay').text('ยอดเงินค่าเช่าซื้อคงเหลือ ' + formatter.format(count_sum))
                     $('#Count_repay').text('ยอดเงินค่าเช่าซื้อคงเหลือ ' + numberWithCommas(parseFloat(
@@ -542,7 +552,7 @@
                 .catch(function(error) {
                     // console.log(error);
                     setTimeout(function() {
-                        // location.reload();
+                        location.reload();
                     }, 5000);
                 });
         }
@@ -814,6 +824,14 @@
             var url = 'FAQ';
             window.open(url, '_blank');
         });
+
+        $("#logout").on('click',function() {
+            $(".loading").css("display", "block");
+            Cookies.remove('APP_ID');
+            Cookies.remove('CUSTOMER_NAME');
+            Cookies.remove('QUOTATION_ID');
+            window.location = '{{ url("/") }}';
+        })
 
     })
 </script>
