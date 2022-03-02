@@ -422,7 +422,7 @@
                         }
 
                         if (card_month == now_month && now_year == card_year) {
-                            if (now_day > card_day) {
+                            if ((now_day + 3 ) > card_day) {
                                 if (Customer_card[i].REPAY_ID == null) {
                                     text_data_late += result;
                                     // $('#alertDate').text('[* ค่างวดของท่านประจำวันที่ ' + result +
@@ -431,16 +431,14 @@
                                 }
                             }
 
-                            if (Customer_card[i].REPAY_ID == null && Customer_card[i].INVOICE_NUMBER !=
-                                null) {
+                            if (Customer_card[i].REPAY_ID == null && Customer_card[i].INVOICE_NUMBER != null) {
                                 REF_NO_data = Customer_card[i].INVOICE_NUMBER;
                             }
 
                         }
 
                         if (card_month >= now_month && now_year >= card_year) {
-                            if (Customer_card[i].REPAY_ID == null && Customer_card[i].INVOICE_NUMBER !=
-                                null) {
+                            if (Customer_card[i].REPAY_ID == null && Customer_card[i].INVOICE_NUMBER !=null) {
                                 REF_NO_data = Customer_card[i].INVOICE_NUMBER;
                             }
                         }
