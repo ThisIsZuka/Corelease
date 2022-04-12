@@ -182,6 +182,14 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="d-none" id="div_contract_status">
+                    <hr style="color: red;">
+                    <p class="mt-3 text-center" style="color: red;" id="txt_header_contract_status"></p>
+                    ภายใน 7 วันจะมีเจ้าหน้าที่ติดต่อเพื่อแจ้งรายละเอียดการนำโปรไฟล์ควบคุมออก กรุณารอรับสายเจ้าหน้าที่
+                    หรือ สอบถามเพื่มเติมที่ <span style="">@Line</span> : <span style="color:#25e425">@ufund</span>
+                </div>
+
             </div>
             {{-- <span class="d-none" id="div_guar">
                 <br><br>
@@ -350,16 +358,24 @@
 
                         let url = null;
 
-                        if(response.data['Guarantor'].QT_NOTPASS == 1){
-                            url = 'https://ufund.comseven.com/Runtime/Runtime/Form/Form.GuarantorPreInfo/?PST_GUAR_ID=' + response.data['Guarantor'].PST_GUAR_ID + '&STATE=CHANGEQUO'
-                        }else{
-                            url =  'https://ufund.comseven.com/Runtime/Runtime/Form/Form.GuarantorAuthen/?QUATATION_ID=' + response.data['Guarantor'].QUOTATION_ID + '&PST_GUAR_ID=' + response.data[ 'Guarantor'].PST_GUAR_ID
+                        if (response.data['Guarantor'].QT_NOTPASS == 1) {
+                            url =
+                                'https://ufund.comseven.com/Runtime/Runtime/Form/Form.GuarantorPreInfo/?PST_GUAR_ID=' +
+                                response.data['Guarantor'].PST_GUAR_ID + '&STATE=CHANGEQUO'
+                        } else {
+                            url =
+                                'https://ufund.comseven.com/Runtime/Runtime/Form/Form.GuarantorAuthen/?QUATATION_ID=' +
+                                response.data['Guarantor'].QUOTATION_ID + '&PST_GUAR_ID=' + response.data[
+                                    'Guarantor'].PST_GUAR_ID
                         }
 
-                        if(response.data['Guarantor'].url_accept_guarantor == 1){
-                            url =  'https://ufund.comseven.com/Runtime/Runtime/Form/Form.GuarantorAuthen/?QUATATION_ID=' + response.data['Guarantor'].QUOTATION_ID + '&PST_GUAR_ID=' + response.data[ 'Guarantor'].PST_GUAR_ID
+                        if (response.data['Guarantor'].url_accept_guarantor == 1) {
+                            url =
+                                'https://ufund.comseven.com/Runtime/Runtime/Form/Form.GuarantorAuthen/?QUATATION_ID=' +
+                                response.data['Guarantor'].QUOTATION_ID + '&PST_GUAR_ID=' + response.data[
+                                    'Guarantor'].PST_GUAR_ID
                         }
-                        
+
                         $('#url_guar').html('<a href="' + url + '" target="blank"> ' + url + ' </a>');
                     }
 
@@ -371,8 +387,10 @@
 
                             $('#Gurantor_ACTIVE').html('<span class="text-success">มีผู้ค้ำประกัน</span>')
 
-                            $txt_Gurantor_ACCEPT = response.data['Guarantor'].Guarantor_Result['ACCEPT_STATUS'];
-                            $txt_Gurantor_RESULT = response.data['Guarantor'].Guarantor_Result['RESULT_GUARANTOR'];
+                            $txt_Gurantor_ACCEPT = response.data['Guarantor'].Guarantor_Result[
+                                'ACCEPT_STATUS'];
+                            $txt_Gurantor_RESULT = response.data['Guarantor'].Guarantor_Result[
+                                'RESULT_GUARANTOR'];
 
                             $RESULT_obj = [{
                                     id: 'WAIT',
@@ -388,8 +406,12 @@
                                 },
                             ]
                             // console.log($RESULT_obj.filter(x => x.id == $txt_Gurantor_RESULT)[0].color)
-                            $('#Gurantor_ACCEPT').html($txt_Gurantor_ACCEPT == 1 ? '<span class="text-success">ยินยอม</span>' : ($txt_Gurantor_ACCEPT == 0 ? '<span class="text-danger">ไม่ยินยอม</span>' : '-'));
-                            $('#Gurantor_RESULT').html('<span class="' + $RESULT_obj.filter(x => x.id == $txt_Gurantor_RESULT)[0].color + '">' + $txt_Gurantor_RESULT +'</span>')
+                            $('#Gurantor_ACCEPT').html($txt_Gurantor_ACCEPT == 1 ?
+                                '<span class="text-success">ยินยอม</span>' : ($txt_Gurantor_ACCEPT ==
+                                    0 ? '<span class="text-danger">ไม่ยินยอม</span>' : '-'));
+                            $('#Gurantor_RESULT').html('<span class="' + $RESULT_obj.filter(x => x.id ==
+                                    $txt_Gurantor_RESULT)[0].color + '">' + $txt_Gurantor_RESULT +
+                                '</span>')
                         } else {
                             $('#Gurantor_ACTIVE').html('<span class="text-danger">ไม่มีผู้ค้ำประกัน</span>')
                             $('#Gurantor_ACCEPT').text('-')
@@ -399,10 +421,34 @@
                     /////////////////////////// End Guarantor /////////////////////////////////////////////////
 
 
+
+                    /////////////////////////// Contract Status /////////////////////////////////////////////////
+
+                    if (response.data['CONTRACT']) {
+                        if (response.data['CONTRACT'][0].STATUS_ID) {
+
+                            $('#div_guar').addClass('d-none');
+                            $('#div_contract_status').removeClass('d-none')
+
+                            let cont_status = response.data['CONTRACT'][0].STATUS_ID;
+                            if (cont_status == '53') {
+                                $('#txt_header_contract_status').text(
+                                    'UFUND ได้ปิดสัญญาล่วงหน้าให้คุณเรียบร้อยแล้ว')
+                            } else if (cont_status == '40') {
+                                $('#txt_header_contract_status').text(
+                                    'UFUND ได้ปิดสัญญาให้คุณเรียบร้อยแล้ว')
+                            }
+                        }
+                    }
+
+                    /////////////////////////// End Contract Status /////////////////////////////////////////////////
+
+
                     if (response.data['step'] == 'StepWaitKYC') {
 
                         $('#Company').text(response.data['Company']);
-                        $('#M_Down').text(numberWithCommas(parseFloat(response.data['Money_Down']).toFixed(2)));
+                        $('#M_Down').text(numberWithCommas(parseFloat(response.data['Money_Down']).toFixed(
+                            2)));
                         $('#Approve_Code').text(response.data['APPROVE_CODE']);
                         $('#col_Approve').css('display', 'block');
                         $('#col_information').css('padding-right', '20px')
@@ -432,9 +478,55 @@
                         $('#Progress_bar').text('50%');
                     } else if (response.data['step'] == 'StepRework') {
 
+                        let item = response.data.etc;
                         let html = '';
-                        for (let i = 0; i < response.data.etc.length; i++) {
-                            html += '- ' + response.data.etc[i].MEMO + '<br>';
+
+                        let results = item.reduce(function(results, item) {
+                            (results[item.CreateDate] = results[item.CreateDate] || []).push(item);
+                            return results;
+                        }, {})
+
+
+                        let count_rework = Object.keys(results).length;
+                        for (let date_key of Object.keys(results)) {
+                            // console.log(date_key)
+                            let txt_date = '';
+                            let time = null;
+                            if (date_key != '' && date_key != 'null') {
+                                let date = (date_key.split(' ')[0]).split('-');
+                                time = (date_key.split(' ')[1]).split('.')[0]
+                                txt_date = date[2] + '-' + date[1] + '-' + date[0];
+                            }
+
+
+
+                            html += `
+                                <b> Rework ${count_rework} </b> ${txt_date == '' || txt_date == null ? '' : '<u>วันที่</u> ' + txt_date + ' <u>เวลา</u> ' + time + ' น.'} <br>
+                                ${(function() {
+                                    subhtml = ''
+                                    for (let i = 0; i < results[date_key].length; i++) {
+                                        subhtml += `
+                                        *${results[date_key][i].STD_STATUS_DESCRIPTION} ${results[date_key][i].STR_STATUS_REASON == null || results[date_key][i].STR_STATUS_REASON == '' ? ' ': '- ' +  results[date_key][i].STR_STATUS_REASON}
+
+                                        ${(function() {
+                                            text_callback = '';
+                                            if(results[date_key][i].STD_STATUS_CODE == 'RW3'){
+                                                text_callback = '<small class="text-muted"> (กรุณา ติดต่อที่ Line : <a style="color:#06c755; text-decoration:none" href="http://line.me/ti/p/@ufund" target="blank">@ufund</a>) </small>';
+                                            }else if(results[date_key][i].STD_STATUS_CODE != 'RW3' && results[date_key][i].STATUS_CODE == "RW"){
+                                                text_callback = '<small class="text-muted"> (กรุณาติดต่อที่สาขา ที่ท่านเลือกทำรายการ) </small>';
+                                            }
+
+                                            return text_callback;
+                                        })()}
+
+                                        <br>
+                                        `;
+                                    }
+                                    return subhtml;
+                                })()}
+                                <br>
+                            `;
+                            count_rework--
                         }
                         $('#list_etc_rework').html(html)
                         $('#col_etc_rework').css('display', 'block');

@@ -21,7 +21,7 @@ class PageCustomer_Controller extends BaseController
             // $Q_id = $data['Qid'];
 
 
-            // Get Product
+            // Get สินเค้า
             $product_KYC = DB::table('dbo.PRODUCT')
                 ->select('CATEGORY_NAME', 'MT_BRAND.BRAND_NAME', 'SERIES_NAME')
                 ->leftJoin('MT_CATEGORY', 'PRODUCT_CATEGORY', '=', 'MT_CATEGORY.CATEGORY_ID')
@@ -29,23 +29,27 @@ class PageCustomer_Controller extends BaseController
                 ->leftJoin('MT_SERIES', 'PRODUCT_SERIES', '=', 'MT_SERIES.SERIES_ID')
                 ->where('APP_ID', $data['APP_ID'])
                 ->get();
-
             $return_data->product = $product_KYC;
 
 
-            // Get Credit
+            // Get รายการบิลทุกรอบ
             $Customer_card = DB::table('dbo.CUSTOMER_CARD')
                 ->select('CUSTOMER_CARD.INSTALL_NUM',  'CUSTOMER_CARD.DUEDATE',  'CUSTOMER_CARD.INSTALL_AMT', 'CUSTOMER_CARD.INVOICE_NUMBER', 'CUSTOMER_CARD.RECEIPT_NUMBER', 'INVOICE.INVOICE_ID', 'REPAYMENT.REPAY_ID', 'TAX_INVOICE.TAX_INVOICE_ID', 'TAX_INVOICE.TAX_NUMBER', 'INVOICE.SUM_AMT', 'CUSTOMER_CARD.CONTRACT_NUMBER')
                 ->leftJoin('INVOICE', 'CUSTOMER_CARD.INVOICE_NUMBER', '=', 'INVOICE.INVOICE_NUMBER')
-                ->leftJoin('REPAYMENT', 'CUSTOMER_CARD.RECEIPT_NUMBER', '=', 'REPAYMENT.RECEIPT_NUMBER')
+                // ->leftJoin('REPAYMENT', 'CUSTOMER_CARD.RECEIPT_NUMBER', '=', 'REPAYMENT.RECEIPT_NUMBER')
+                ->leftJoin('REPAYMENT', 'CUSTOMER_CARD.ID', '=', 'REPAYMENT.CUSTOMER_CARD_ID')
                 ->leftJoin('TAX_INVOICE', 'REPAYMENT.TAX_NUMBER', '=', 'TAX_INVOICE.TAX_NUMBER')
                 ->where('CUSTOMER_CARD.APPLICATION_NUMBER', $data['APP_ID'])
+                ->where(function($query){
+                    $query->where('REPAYMENT.REPAY_TYPE','2');
+                    $query->OrwhereNull('REPAYMENT.REPAY_TYPE');
+                })
                 ->orderBy('CUSTOMER_CARD.INSTALL_NUM', 'ASC')
                 ->get();
             $return_data->Customer_card = $Customer_card;
+            // dd($Customer_card);
 
-
-            // GET QRCode
+            // GET QRCode รอบบิลนั้นๆ
             $REF_NO = $Customer_card[0]->CONTRACT_NUMBER;
             $QR_Code = DB::table('dbo.TTP_INV_BARCODE')
                 ->select('TTP_INV_BARCODE.INV_NO',  'TTP_INV_BARCODE.DUE_DATE',  'TTP_INV_BARCODE.REF1_NO', 'TTP_INV_BARCODE.INV_AMT', 'TTP_INV_BARCODE.QRCODE_FILE')
@@ -66,7 +70,7 @@ class PageCustomer_Controller extends BaseController
                 ->where('APP_ID', $data['APP_ID'])
                 ->get();
 
-            // GET Address
+            // ที่อยู่ลูกค้า (A3 ที่อยู่จัดส่งเอกสาร)
             $Address = DB::table('dbo.ADDRESS')
                 ->select('ADDRESS.A3_NO', 'ADDRESS.A3_MOI', 'ADDRESS.A3_SOI', 'ADDRESS.A3_VILLAGE', 'ADDRESS.A3_BUILDING', 'ADDRESS.A3_SOI', 'ADDRESS.A3_ROAD', 'MT_SUB_DISTRICT.SUB_DISTRICT_NAME', 'MT_DISTRICT.DISTRICT_NAME', 'MT_PROVINCE.PROVINCE_NAME', 'MT_POST_CODE.POST_CODE_ID')
                 ->leftJoin('MT_SUB_DISTRICT', 'ADDRESS.A3_SUBDISTRICT', '=', 'MT_SUB_DISTRICT.SUB_DISTRICT_ID')
@@ -77,6 +81,13 @@ class PageCustomer_Controller extends BaseController
                 ->get();
             $return_data->Address = $Address;
 
+
+            // สัญญา
+            $CONTRACT = DB::table('dbo.CONTRACT')
+                ->select('*')
+                ->where('APP_ID', $data['APP_ID'])
+                ->get();
+            $return_data->CONTRACT = $CONTRACT;
 
             // 
             $PDF_INSURANCE = DB::table('dbo.PDF_FORM')
@@ -110,7 +121,8 @@ class PageCustomer_Controller extends BaseController
 
             $data = $request->all();
             $return_data->PDF_Base64 = [];
-            // Get PDF
+
+            // Get PDF ใบแจ้งหนี้
             $PDF = DB::table('dbo.PDF_FORM')
                 ->select('PDF_NAME')
                 ->where('INVOICE_ID', $data['PDF_ID'])
@@ -168,7 +180,7 @@ class PageCustomer_Controller extends BaseController
 
             $data = $request->all();
 
-            // Get PDF
+            // Get PDF ใบเสร็จ
             $PDF = DB::table('dbo.PDF_FORM')
                 ->select('PDF_NAME')
                 ->where('REPAY_ID', $data['PDF_ID'])
@@ -217,7 +229,7 @@ class PageCustomer_Controller extends BaseController
 
             $data = $request->all();
 
-            // Get PDF
+            // Get PDF ใบกำกับภาษี
             $PDF = DB::table('dbo.PDF_FORM')
                 ->select('PDF_NAME')
                 ->where('TAX_INVOICE_ID', $data['PDF_ID'])
@@ -272,7 +284,7 @@ class PageCustomer_Controller extends BaseController
 
             $data = $request->all();
 
-            // Get PDF
+            // Get PDF สัญญา
             $PDF = DB::table('dbo.PDF_FORM')
                 ->select('PDF_NAME')
                 ->where('APP_ID', $data['APP_ID'])
@@ -314,7 +326,7 @@ class PageCustomer_Controller extends BaseController
 
             $data = $request->all();
 
-            // Get PDF
+            // Get PDF ตารางค่างวด
             $PDF = DB::table('dbo.PDF_FORM')
                 ->select('PDF_NAME')
                 ->where('APP_ID', $data['APP_ID'])
@@ -357,7 +369,7 @@ class PageCustomer_Controller extends BaseController
 
             $data = $request->all();
 
-            // Get PDF
+            // Get PDF ใบเสร็จเงินดาวน์
             $PDF = DB::table('dbo.PDF_FORM')
                 ->select('PDF_NAME')
                 ->where('APP_ID', $data['APP_ID'])
@@ -408,7 +420,7 @@ class PageCustomer_Controller extends BaseController
 
             $data = $request->all();
 
-            // Get PDF
+            // Get PDF ใบกำกับภาษีเงินดาวน์
             $PDF = DB::table('dbo.PDF_FORM')
                 ->select('PDF_NAME')
                 ->where('APP_ID', $data['APP_ID'])
@@ -490,8 +502,8 @@ class PageCustomer_Controller extends BaseController
 
             return $return_data;
         } catch (Exception $e) {
-            return response()->json(array('message' => $e->getMessage()));
-            // return response()->json(array('message' => 'ERROR'));
+            // return response()->json(array('message' => $e->getMessage()));
+            return response()->json(array('message' => 'ERROR'));
         }
     }
 

@@ -226,7 +226,8 @@ class PageCheckID_Controller extends BaseController
                 return 'NoData';
             }
         } catch (Exception $e) {
-            return response()->json(array('message' => $e->getMessage()));
+            // return response()->json(array('message' => $e->getMessage()));
+            return response()->json(array('message' => 'ERROR'));
         }
     }
 }

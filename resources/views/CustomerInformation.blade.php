@@ -48,10 +48,10 @@
             <img src="{{ asset('images/UFUND.png') }}" alt="" style="width: 15%; cursor: pointer;" id="icon_ufond"
                 onclick="window.location = '{{ url('/') }}'">
         </div> --}}
-        <div class="row"> 
+        <div class="row">
             <div class="col text-start">
-                <img src="{{ asset('images/UFUND.png') }}" alt="" style="width: 30%; cursor: pointer;" id="icon_ufond"
-                    onclick="window.location = '{{ url('/') }}'">
+                <img src="{{ asset('images/UFUND.png') }}" alt="" style="width: 30%; cursor: pointer;"
+                    id="icon_ufond" onclick="window.location = '{{ url('/') }}'">
                 {{-- <h1>UAT</h1> --}}
             </div>
             <div class="col text-end align-self-center">
@@ -89,8 +89,8 @@
                             <div class="col-sm-12 col-md-4 col-lg-3 mt-3 text-center" style="display: none" id="div_QR">
                                 <a id="href_QR">
                                     <h6>คลิกเพื่อสแกนชำระเงิน</h6>
-                                    <img id="img_qrcode" src="{{ asset('images/QR_Code.png') }}" style="width: 8rem; border: 2px solid red;"
-                                        class="mb-1">
+                                    <img id="img_qrcode" src="{{ asset('images/QR_Code.png') }}"
+                                        style="width: 8rem; border: 2px solid red;" class="mb-1">
                                     <p id="QR_price"> </p>
                                 </a>
                             </div>
@@ -119,7 +119,7 @@
                         งวดละ 100 บาท และค่าติดตามทวงถามงวดละ 100 บาท
                         <br>
                     </div>
-                    <div class="card-footer footer_card_customer"> 
+                    <div class="card-footer footer_card_customer">
                         <div class="row">
                             <div class="col-sm-12 col-md-12 col-lg-3" style="cursor: pointer;" title="ดาวน์โหลด"
                                 id="PDF_CONTRACT">
@@ -308,15 +308,15 @@
                         APP_ID: (Cookies.get('APP_ID') ? Cookies.get('APP_ID') : null),
                     }
                 }).then(function(response) {
-                    // console.log(response.data);
+                    console.log(response.data);
 
                     $('#SERIES_NAME').text(response.data['product'][0].SERIES_NAME)
                     $('#CATEGORY_NAME').text(response.data['product'][0].CATEGORY_NAME)
                     $('#BRAND_NAME').text(response.data['product'][0].BRAND_NAME)
                     $('#COLOR_NAME').text(response.data['product'][0].COLOR_NAME)
 
-                    if(!response.data['product'][0].COLOR_NAME){
-                        $('#span_color').css('display','none')
+                    if (!response.data['product'][0].COLOR_NAME) {
+                        $('#span_color').css('display', 'none')
                     }
 
                     $('#A2_NO').text(response.data['Address'][0].A3_NO)
@@ -334,8 +334,7 @@
                             day: "2-digit",
                         });
 
-                    $('#INSTALL_AMT').text(numberWithCommas(parseFloat(response.data['Customer_card'][0]
-                        .INSTALL_AMT).toFixed(2)))
+                    $('#INSTALL_AMT').text(numberWithCommas(parseFloat(response.data['Customer_card'][0].INSTALL_AMT).toFixed(2)))
                     $('#INSTALL_NUM').text(response.data['Customer_card'].length)
                     $('#FIRST_DUEDATE').text(First_result)
 
@@ -414,7 +413,7 @@
 
                         //  check Date Late
                         if (card_month < now_month && card_year <= now_year) {
-                            if (Customer_card[i].REPAY_ID == null) {
+                            if (Customer_card[i].RECEIPT_NUMBER == null) {
                                 REF_NO_data = Customer_card[i].INVOICE_NUMBER;
                                 text_data_late += result + ' , ';
                                 $('#alertDate').css('display', 'block')
@@ -422,8 +421,8 @@
                         }
 
                         if (card_month == now_month && now_year == card_year) {
-                            if ((now_day + 3 ) > card_day) {
-                                if (Customer_card[i].REPAY_ID == null) {
+                            if ((now_day + 3) > card_day) {
+                                if (Customer_card[i].RECEIPT_NUMBER == null) {
                                     text_data_late += result;
                                     // $('#alertDate').text('[* ค่างวดของท่านประจำวันที่ ' + result +
                                     //     ' เกินกำหนดชำระ กรุณาชำระเงินตามกำหนด]')
@@ -431,56 +430,57 @@
                                 }
                             }
 
-                            if (Customer_card[i].REPAY_ID == null && Customer_card[i].INVOICE_NUMBER != null) {
+                            if (Customer_card[i].RECEIPT_NUMBER == null && Customer_card[i].INVOICE_NUMBER !=null) {
                                 REF_NO_data = Customer_card[i].INVOICE_NUMBER;
                             }
 
                         }
 
                         if (card_month >= now_month && now_year >= card_year) {
-                            if (Customer_card[i].REPAY_ID == null && Customer_card[i].INVOICE_NUMBER !=null) {
+                            if (Customer_card[i].RECEIPT_NUMBER == null && Customer_card[i].INVOICE_NUMBER != null) {
                                 REF_NO_data = Customer_card[i].INVOICE_NUMBER;
                             }
                         }
                         // check Count Repay
-                        if (Customer_card[i].REPAY_ID == null) {
+                        if (Customer_card[i].RECEIPT_NUMBER == null) {
                             data = parseFloat(Customer_card[i].INSTALL_AMT).toFixed(2);
                             count_sum = parseFloat(count_sum) + parseFloat(data);
                         }
 
-                        html += '<tr>' +
-                            '<th scope="row">' + Customer_card[i].INSTALL_NUM + '</th>' +
-                            // '<td>' + Customer_card[i].DUEDATE + '</td>' +
-                            '<td>' + result + '</td>' +
-                            '<td>' + parseFloat(Customer_card[i].INSTALL_AMT).toFixed(2) + '</td>' +
-                            '<td>' + (Customer_card[i].INVOICE_NUMBER != null ? Customer_card[i]
-                                .INVOICE_NUMBER : '-') + '</td>' +
-                            '<td>' + (Customer_card[i].RECEIPT_NUMBER != null ? 'ชำระเรียบร้อย' :
-                                'ยังไม่ชำระ') + '</td>' +
-                            '<td>' + (Customer_card[i].SUM_AMT != null ? parseFloat(Customer_card[i]
-                                .SUM_AMT).toFixed(2) : '-') + '</td>' +
-                            '<td>' + (Customer_card[i].INVOICE_ID != null ?
-                                '<i class="fas fa-file-pdf fa-lg" style="color: red; cursor: pointer;" title="ดาวน์โหลด" id="PDF_INVOICE_NUMBER" data_value="' +
-                                Customer_card[i].INVOICE_ID + '" data_INVOICE_NUMBER="' + Customer_card[i]
-                                .INVOICE_NUMBER + '"></i>' : '-') + '</td>' +
-                            '<td>' + (Customer_card[i].REPAY_ID != null && Customer_card[i]
-                                .INVOICE_NUMBER != 1 ?
-                                '<i class="fas fa-file-pdf fa-lg" style="color: red; cursor: pointer;" title="ดาวน์โหลด" id="PDF_REPAY_ID" data_value="' +
-                                Customer_card[i].REPAY_ID + '"  data_RECEIPT_NUMBER="' + Customer_card[i]
-                                .RECEIPT_NUMBER + '"></i>' : '-') + '</td>' +
-                            '<td>' + (Customer_card[i].TAX_INVOICE_ID != null && Customer_card[i]
-                                .INVOICE_NUMBER != 1 ?
-                                '<i class="fas fa-file-pdf fa-lg" style="color: red; cursor: pointer;" title="ดาวน์โหลด" id="PDF_TAX_INVOICE" data_value="' +
-                                Customer_card[i].TAX_INVOICE_ID + '" data_RECEIPT_NUMBER="' + Customer_card[
-                                    i].RECEIPT_NUMBER + '"></i>' : '-') + '</td>' +
-                            '</tr>';
+                        // html += '<tr>' +
+                        //     '<th scope="row">' + Customer_card[i].INSTALL_NUM + '</th>' +
+                        //     // '<td>' + Customer_card[i].DUEDATE + '</td>' +
+                        //     '<td>' + result + '</td>' +
+                        //     '<td>' + parseFloat(Customer_card[i].INSTALL_AMT).toFixed(2) + '</td>' +
+                        //     '<td>' + (Customer_card[i].INVOICE_NUMBER != null ? Customer_card[i].INVOICE_NUMBER : '-') + '</td>' +
+                        //     '<td>' + (Customer_card[i].RECEIPT_NUMBER != null ? 'ชำระเรียบร้อย' :'ยังไม่ชำระ') + '</td>' +
+                        //     '<td>' + (Customer_card[i].SUM_AMT != null ? parseFloat(Customer_card[i].SUM_AMT).toFixed(2) : '-') + '</td>' +
+                        //     '<td>' + (Customer_card[i].INVOICE_ID != null ?'<i class="fas fa-file-pdf fa-lg" style="color: red; cursor: pointer;" title="ดาวน์โหลด" id="PDF_INVOICE_NUMBER" data_value="' +Customer_card[i].INVOICE_ID + '" data_INVOICE_NUMBER="' + Customer_card[i].INVOICE_NUMBER + '"></i>' : '-') + '</td>' +
+                        //     '<td>' + (Customer_card[i].REPAY_ID != null && Customer_card[i].INVOICE_NUMBER != 1 ?'<i class="fas fa-file-pdf fa-lg" style="color: red; cursor: pointer;" title="ดาวน์โหลด" id="PDF_REPAY_ID" data_value="' + Customer_card[i].REPAY_ID + '"  data_RECEIPT_NUMBER="' + Customer_card[i].RECEIPT_NUMBER + '"></i>' : '-') + '</td>' +
+                        //     '<td>' + (Customer_card[i].TAX_INVOICE_ID != null && Customer_card[i].INVOICE_NUMBER != 1 ?'<i class="fas fa-file-pdf fa-lg" style="color: red; cursor: pointer;" title="ดาวน์โหลด" id="PDF_TAX_INVOICE" data_value="' +Customer_card[i].TAX_INVOICE_ID + '" data_RECEIPT_NUMBER="' + Customer_card[i].RECEIPT_NUMBER + '"></i>' : '-') + '</td>' +
+                        //     '</tr>';
+
+                        html += `
+                            <tr>
+                                <th scope="row"> ${Customer_card[i].INSTALL_NUM} </th>
+                                <td> ${result} </td>
+                                <td> ${parseFloat(Customer_card[i].INSTALL_AMT).toFixed(2)} </td>
+                                <td> ${(Customer_card[i].INVOICE_NUMBER != null ? Customer_card[i].INVOICE_NUMBER : '-')} </td>
+                                <td> ${(Customer_card[i].RECEIPT_NUMBER != null ? 'ชำระเรียบร้อย' : 'ยังไม่ชำระ')} </td>
+                                <td> ${(Customer_card[i].SUM_AMT != null ? parseFloat(Customer_card[i].SUM_AMT).toFixed(2) : '-')} </td>
+                                <td> ${(Customer_card[i].INVOICE_ID != null ? '<i class="fas fa-file-pdf fa-lg" style="color: red; cursor: pointer;" title="ดาวน์โหลด" id="PDF_INVOICE_NUMBER" data_value="' + Customer_card[i].INVOICE_ID + '" data_INVOICE_NUMBER="' + Customer_card[i].INVOICE_NUMBER + '"></i>' : '-')} </td>
+                                <td> ${(Customer_card[i].RECEIPT_NUMBER != null && Customer_card[i].INVOICE_NUMBER != 1 ?'<i class="fas fa-file-pdf fa-lg" style="color: red; cursor: pointer;" title="ดาวน์โหลด" id="PDF_REPAY_ID" data_value="' + Customer_card[i].REPAY_ID + '"  data_RECEIPT_NUMBER="' + Customer_card[i].RECEIPT_NUMBER + '"></i>' : '-')} </td>
+                                <td> ${(Customer_card[i].RECEIPT_NUMBER != null && Customer_card[i].TAX_INVOICE_ID != null && Customer_card[i].INVOICE_NUMBER != 1 ?'<i class="fas fa-file-pdf fa-lg" style="color: red; cursor: pointer;" title="ดาวน์โหลด" id="PDF_TAX_INVOICE" data_value="' +Customer_card[i].TAX_INVOICE_ID + '" data_RECEIPT_NUMBER="' + Customer_card[i].RECEIPT_NUMBER + '"></i>' : '-')} </td>
+                            </tr>
+                            `
                     }
 
-                    if (REF_NO_data != null) {
+                    if (REF_NO_data != null && REF_NO_data != 1) {
                         GET_QR_Code(REF_NO_data)
                     }
 
-                    txtalert = '[* ค่างวดของท่านประจำวันที่ ' + text_data_late +' เกินกำหนดชำระ กรุณาชำระตามบิลเรียกเก็บ <br> และขออภัย หากท่านชำระเรียบร้อยแล้ว กรุณารอรับใบเสร็จ ภายใน 7วันทำการ ]'
+                    txtalert = '[* ค่างวดของท่านประจำวันที่ ' + text_data_late +
+                        ' เกินกำหนดชำระ กรุณาชำระตามบิลเรียกเก็บ <br> และขออภัย หากท่านชำระเรียบร้อยแล้ว กรุณารอรับใบเสร็จ ภายใน 7วันทำการ ]'
                     $('#alertDate').html(txtalert)
                     $('#Tbody').html(html);
                     // $('#Count_repay').text('ยอดเงินค่าเช่าซื้อคงเหลือ ' + formatter.format(count_sum))
@@ -548,7 +548,7 @@
                     $(".loading").css("display", "none");
                 })
                 .catch(function(error) {
-                    // console.log(error);
+                    console.log(error);
                     setTimeout(function() {
                         location.reload();
                     }, 5000);
@@ -823,12 +823,12 @@
             window.open(url, '_blank');
         });
 
-        $("#logout").on('click',function() {
+        $("#logout").on('click', function() {
             $(".loading").css("display", "block");
             Cookies.remove('APP_ID');
             Cookies.remove('CUSTOMER_NAME');
             Cookies.remove('QUOTATION_ID');
-            window.location = '{{ url("/") }}';
+            window.location = '{{ url('/') }}';
         })
 
     })

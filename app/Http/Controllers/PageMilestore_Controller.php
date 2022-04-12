@@ -25,7 +25,7 @@ class PageMilestore_Controller extends BaseController
 
             // Get Guarantor
             $guar_QT = DB::table('dbo.PROSPECT_GUARANTOR')
-                ->select('QUOTATION.QUOTATION_ID' , 'PROSPECT_GUARANTOR.ACCEPT_STATUS')
+                ->select('QUOTATION.QUOTATION_ID', 'PROSPECT_GUARANTOR.ACCEPT_STATUS')
                 ->leftJoin('QUOTATION', 'PROSPECT_GUARANTOR.QUOTATION_ID', '=', 'QUOTATION.QUOTATION_ID')
                 ->where('QUOTATION.STATUS_ID', '27')
                 ->where('QUOTATION.FLAG_GUARANTOR', '1')
@@ -40,6 +40,7 @@ class PageMilestore_Controller extends BaseController
                 ->where('QUOTATION.QUOTATION_ID', isset($data['Qid']) ? $data['Qid'] : null)
                 ->get();
 
+            // ผู้ค้ำไม่ยินยอม
             $guar_QT_NOT_ACCEPT = DB::table('dbo.PROSPECT_GUARANTOR')
                 ->select('QUOTATION.QUOTATION_ID')
                 ->leftJoin('QUOTATION', 'PROSPECT_GUARANTOR.QUOTATION_ID', '=', 'QUOTATION.QUOTATION_ID')
@@ -49,6 +50,7 @@ class PageMilestore_Controller extends BaseController
                 ->where('QUOTATION.QUOTATION_ID', isset($data['Qid']) ? $data['Qid'] : null)
                 ->get();
 
+            // ผู้ค้ำไม่ผ่าน
             $guar_APP_NOTPASS = DB::table('dbo.PROSPECT_GUARANTOR')
                 ->select('QUOTATION.QUOTATION_ID')
                 ->leftJoin('QUOTATION', 'PROSPECT_GUARANTOR.QUOTATION_ID', '=', 'QUOTATION.QUOTATION_ID')
@@ -117,7 +119,7 @@ class PageMilestore_Controller extends BaseController
 
             if (count($guar_QT) != 0) {
                 $object_Guarantor->count = 1;
-                if($guar_QT[0]->ACCEPT_STATUS == '1'){
+                if ($guar_QT[0]->ACCEPT_STATUS == '1') {
                     $object_Guarantor->url_accept_guarantor = 1;
                 }
             } elseif (count($guar_APP) != 0) {
@@ -128,7 +130,7 @@ class PageMilestore_Controller extends BaseController
                 $object_Guarantor->QT_NOTPASS = 1;
                 $object_Guarantor->count = 1;
             } else if (count($guar_Change_guarantor) != 0) {
-                if($guar_Change_guarantor[0]->CHANGE_GUARANTOR == 1){
+                if ($guar_Change_guarantor[0]->CHANGE_GUARANTOR == 1) {
                     $object_Guarantor->QT_NOTPASS = 1;
                     $object_Guarantor->count = 1;
                 }
@@ -245,7 +247,7 @@ class PageMilestore_Controller extends BaseController
                 // Get CONTRACT
                 if ($check != 0) {
                     $CONTRACT = DB::table('dbo.CONTRACT')
-                        ->select('APP_ID', 'CONTRACT_NUMBER')
+                        ->select('APP_ID', 'CONTRACT_NUMBER', 'STATUS_ID')
                         ->where('APP_ID', $Stepapprove[0]->APP_ID)
                         ->get();
                     $check_CONTRACT = count($CONTRACT);
@@ -284,11 +286,18 @@ class PageMilestore_Controller extends BaseController
                             $return_data->step = 'StepDeliver';
                         }
                     } else if ($Stepapprove[0]->CHECKER_RESULT == 'Rework') {
-                        $etc = DB::table('dbo.APPROVAL_HISTORY')
+
+                        // $etc = DB::table('dbo.APPROVAL_HISTORY')
+                        //     ->select('APPROVAL_HISTORY.*')
+                        //     ->where('APPROVAL_HISTORY.APP_ID', $Stepapprove[0]->APP_ID)
+                        //     ->where('APPROVAL_HISTORY.STATUS_ID', '5')
+                        //     ->get();
+                        $etc = DB::table('dbo.APPROVAL_HISTORY_STATUS_DESC')
                             ->select('*')
                             ->where('APP_ID', $Stepapprove[0]->APP_ID)
-                            ->where('STATUS_ID', '5')
+                            ->orderBy('CreateDate','DESC')
                             ->get();
+                        // dd($etc);
 
                         $return_data->etc = $etc;
                         $return_data->step = 'StepRework';
@@ -363,7 +372,8 @@ class PageMilestore_Controller extends BaseController
                 return $return_data;
             }
         } catch (Exception $e) {
-            return response()->json(array('message' => $e->getMessage()));
+            // return response()->json(array('message' => $e->getMessage()));
+            return response()->json(array('message' => 'ERROR'));
         }
     }
 
@@ -400,7 +410,8 @@ class PageMilestore_Controller extends BaseController
 
             return $return_data;
         } catch (Exception $e) {
-            return response()->json(array('message' => $e->getMessage()));
+            // return response()->json(array('message' => $e->getMessage()));
+            return response()->json(array('message' => 'ERROR'));
         }
     }
 }
