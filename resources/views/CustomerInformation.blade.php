@@ -42,7 +42,8 @@
 
     <div class="container mt-3">
 
-        <div class="loading" style="display: none">Loading&#8230;</div>
+        {{-- <div class="loading" style="display: none">Loading&#8230;</div> --}}
+        <div class="loading" style="display: none"><div></div><div></div><div></div><div></div></div>
 
         {{-- <div>
             <img src="{{ asset('images/UFUND.png') }}" alt="" style="width: 15%; cursor: pointer;" id="icon_ufond"
@@ -50,8 +51,7 @@
         </div> --}}
         <div class="row">
             <div class="col text-start">
-                <img src="{{ asset('images/UFUND.png') }}" alt="" style="width: 30%; cursor: pointer;"
-                    id="icon_ufond" onclick="window.location = '{{ url('/') }}'">
+                @include('templates.Icon_header')
                 {{-- <h1>UAT</h1> --}}
             </div>
             <div class="col text-end align-self-center">
@@ -114,9 +114,9 @@
                         <br>
                         -----------------------------------------
                         <br>
-                        บริษัทฯ จะมีใบแจ้งการชำระเงินให้กับลูกค้าล่วงหน้า 15 วันก่อนวันชำระค่างวด
-                        หากชำระล่าช้าบริษัทคิดค่าปรับ
-                        งวดละ 100 บาท และค่าติดตามทวงถามงวดละ 100 บาท
+                        บริษัทฯ จะมีอัพเดตใบแจ้งยอดชำระ ให้กับลูกค้าล่วงหน้า 15 วัน ก่อนถึงวันกำหนดชำระค่างวด 
+                        หากชำระล่าช้าบริษัทฯ จะมีการคิดค่าปรับ และค่าติดตามทวงถาม ตามเงื่อนไขของบริษัทฯ 
+                        รายละเอียดแนบท้าย ตามใบแจ้งยอดชำระ
                         <br>
                     </div>
                     <div class="card-footer footer_card_customer">
@@ -221,6 +221,14 @@
     $(document).ready(function() {
 
         $(".loading").css("display", "block");
+
+        var env = '{{ env('APP_ENV') }}';
+
+        if (env == 'production') {
+            env_K2_url = 'https://ufund.comseven.com'
+        } else {
+            env_K2_url = 'https://43.254.133.148'
+        }
 
         // $(document).on('click', "#btn_calcu", function() {
         //     // window.open('https://10.102.1.12/Runtime/Runtime/Form/PreviewInvoiceAdhoc280820/?CONTRACT_ID=6050&ID=91010&INVOICE_ID=125773', '_blank');
@@ -484,8 +492,11 @@
                     $('#alertDate').html(txtalert)
                     $('#Tbody').html(html);
                     // $('#Count_repay').text('ยอดเงินค่าเช่าซื้อคงเหลือ ' + formatter.format(count_sum))
-                    $('#Count_repay').text('ยอดเงินค่าเช่าซื้อคงเหลือ ' + numberWithCommas(parseFloat(
-                        count_sum).toFixed(2)) + ' บาท')
+                    if(response.data.CONTRACT[0].STATUS_ID == "53" || response.data.CONTRACT[0].STATUS_ID == "40"){
+                        $('#Count_repay').text('ยอดเงินค่าเช่าซื้อคงเหลือ 0 บาท')
+                    }else{
+                        $('#Count_repay').text('ยอดเงินค่าเช่าซื้อคงเหลือ ' + numberWithCommas(parseFloat(count_sum).toFixed(2)) + ' บาท')
+                    }
 
                     $(".loading").css("display", "none");
 
@@ -550,7 +561,7 @@
                 .catch(function(error) {
                     console.log(error);
                     setTimeout(function() {
-                        location.reload();
+                        // location.reload();
                     }, 5000);
                 });
         }
@@ -621,7 +632,7 @@
                 .catch(function(error) {
                     // console.log(error);
                     setTimeout(function() {
-                        location.reload();
+                        // location.reload();
                     }, 5000);
                 });
         }
@@ -752,44 +763,44 @@
 
             let list_url = [{
                     type: 'CONTRACT',
-                    url: 'https://ufund.comseven.com/Runtime/Runtime/Form/EditContract+HirePurhcase/?APP_ID=' +
+                    url: env_K2_url + '/Runtime/Runtime/Form/EditContract+HirePurhcase/?APP_ID=' +
                         data.APP_ID + '&PERSION_ID=' + data.PERSION_ID + '&PROD_ID=' + data.PROD_ID +
                         '&CONTRACT_ID=' + data.CONTRACT_ID
                 },
                 {
                     type: 'RPDOWN',
-                    url: 'https://ufund.comseven.com/Runtime/Runtime/Form/ReGen__Preview+Receipt+Payment/?_state=GenReceiptDownAmount&CONTRACT_ID=&ID=' +
+                    url: env_K2_url + '/Runtime/Runtime/Form/ReGen__Preview+Receipt+Payment/?_state=GenReceiptDownAmount&CONTRACT_ID=&ID=' +
                         data.CONTRACT_ID + '&REPAY_ID=' + data.REPAY_ID + '&PROD_ID=' + data.PROD_ID +
                         '&PERSON_ID=' + data.PERSON_ID + '&APP_ID=' + data.APP_ID
                 },
                 {
                     type: 'TPDOWN',
-                    url: 'https://ufund.comseven.com/Runtime/Runtime/Form/ReGen__Preview+TAX+Repayment/?_state=GenPDF_TaxDown&CONTRACT_ID=&ID=' +
+                    url: env_K2_url + '/Runtime/Runtime/Form/ReGen__Preview+TAX+Repayment/?_state=GenPDF_TaxDown&CONTRACT_ID=&ID=' +
                         data.CONTRACT_ID + '&REPAY_ID=' + data.REPAY_ID + '&PROD_ID=' + data.PROD_ID +
                         '&PERSON_ID=' + data.PERSON_ID + '&APP_ID=' + data.APP_ID
                 },
                 {
                     type: 'TBDOWN',
-                    url: 'https://ufund.comseven.com/Runtime/Runtime/Form/Re-GenTableCalculate/?CONTRACT_ID=' +
+                    url: env_K2_url + '/Runtime/Runtime/Form/Re-GenTableCalculate/?CONTRACT_ID=' +
                         data.CONTRACT_ID + '&APP_ID=' + data.APP_ID + '&PERSON_ID=' + data.PERSION_ID
                 },
                 {
                     type: 'INVOICE',
-                    // url: 'https://ufund.comseven.com/Runtime/Runtime/Form/PreviewInvoiceAsof020820/?CONTRACT_ID=' +
+                    // url: env_K2_url + '/Runtime/Runtime/Form/PreviewInvoiceAsof020820/?CONTRACT_ID=' +
                     //     data.CONTRACT_ID + '&ID=' + data.ID + '&INVOICE_ID=' + data.INVOICE_ID,
-                    url: 'https://ufund.comseven.com/Runtime/Runtime/Form/PreviewInvoiceAsof020820__ReadOnly/?CONTRACT_ID=' +
+                    url: env_K2_url + '/Runtime/Runtime/Form/PreviewInvoiceAsof020820__ReadOnly/?CONTRACT_ID=' +
                         data.CONTRACT_ID + '&ID=' + data.ID + '&INVOICE_ID=' + data.INVOICE_ID,
                 },
                 {
                     type: 'REPAY',
-                    url: 'https://ufund.comseven.com/Runtime/Runtime/Form/ReGen__Preview+Receipt+Payment/?_state=GenManualReceipt&CONTRACT_ID=' +
+                    url: env_K2_url + '/Runtime/Runtime/Form/ReGen__Preview+Receipt+Payment/?_state=GenManualReceipt&CONTRACT_ID=' +
                         data.CONTRACT_ID + '&ID=' + data.ID + '&REPAY_ID=' + data.REPAY_ID +
                         '&PROD_ID=' + data.PROD_ID + '&PERSON_ID=' + data.PERSION_ID +
                         '&APP_ID=' + data.APP_ID
                 },
                 {
                     type: 'TAX_INVOICE',
-                    url: 'https://ufund.comseven.com/Runtime/Runtime/Form/ReGen__Preview+TAX+Repayment/?_state=GenPDF&CONTRACT_ID=' +
+                    url: env_K2_url + '/Runtime/Runtime/Form/ReGen__Preview+TAX+Repayment/?_state=GenPDF&CONTRACT_ID=' +
                         data.CONTRACT_ID + '&ID=' + data.ID + '&REPAY_ID=' + data.REPAY_ID +
                         '&PROD_ID=' + data.PROD_ID + '&PERSON_ID=' + data.PERSION_ID +
                         '&APP_ID=' + data.APP_ID

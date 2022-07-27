@@ -44,12 +44,17 @@
 
     <div class="container mt-3">
 
-        <div class="loading" style="display: none">Loading&#8230;</div>
+        {{-- <div class="loading" style="display: none">Loading&#8230;</div> --}}
+        <div class="loading" style="display: none">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
 
         <div class="row">
             <div class="col text-start">
-                <img src="{{ asset('images/UFUND.png') }}" alt="" style="width: 30%; cursor: pointer;"
-                    id="icon_ufond" onclick="window.location = '{{ url('/') }}'">
+                @include('templates.Icon_header')
                 {{-- <h1>UAT</h1> --}}
             </div>
             <div class="col text-end align-self-center">
@@ -137,7 +142,8 @@
                         แจ้งรหัส Approve Code : <u><span id="Approve_Code"></span></u> กับเจ้าหน้าที่
 
                         <br><br>
-                        หากมีข้อสงสัย <span style="">@Line</span> : <span style="color:#25e425">@ufund</span>
+                        หากมีข้อสงสัย <span style="">@Line</span> : <a href="https://line.me/ti/p/@ufund"
+                            style="color:#25e425; text-decoration: none;"> @ufund</a>
                     </div>
 
                     <div class="col-sm-12 col-md-6 col-lg-6" id="col_etc_rework" style="display: none;color:red">
@@ -187,7 +193,8 @@
                     <hr style="color: red;">
                     <p class="mt-3 text-center" style="color: red;" id="txt_header_contract_status"></p>
                     ภายใน 7 วันจะมีเจ้าหน้าที่ติดต่อเพื่อแจ้งรายละเอียดการนำโปรไฟล์ควบคุมออก กรุณารอรับสายเจ้าหน้าที่
-                    หรือ สอบถามเพื่มเติมที่ <span style="">@Line</span> : <span style="color:#25e425">@ufund</span>
+                    หรือ สอบถามเพื่มเติมที่ <span style="">@Line</span> : <span
+                        style="color:#25e425">@ufund</span>
                 </div>
 
             </div>
@@ -269,6 +276,15 @@
 </html>
 <script>
     $(document).ready(function() {
+
+        var env = '{{ env('APP_ENV') }}';
+
+        if (env == 'production') {
+            env_K2_url = 'https://ufund.comseven.com'
+        } else {
+            env_K2_url = 'https://43.254.133.148'
+        }
+
 
         $(".loading").css("display", "block");
 
@@ -359,19 +375,18 @@
                         let url = null;
 
                         if (response.data['Guarantor'].QT_NOTPASS == 1) {
-                            url =
-                                'https://ufund.comseven.com/Runtime/Runtime/Form/Form.GuarantorPreInfo/?PST_GUAR_ID=' +
+                            url = env_K2_url + '/Runtime/Runtime/Form/Form.GuarantorPreInfo/?PST_GUAR_ID=' +
                                 response.data['Guarantor'].PST_GUAR_ID + '&STATE=CHANGEQUO'
                         } else {
                             url =
-                                'https://ufund.comseven.com/Runtime/Runtime/Form/Form.GuarantorAuthen/?QUATATION_ID=' +
+                                env_K2_url + '/Runtime/Runtime/Form/Form.GuarantorAuthen/?QUATATION_ID=' +
                                 response.data['Guarantor'].QUOTATION_ID + '&PST_GUAR_ID=' + response.data[
                                     'Guarantor'].PST_GUAR_ID
                         }
 
                         if (response.data['Guarantor'].url_accept_guarantor == 1) {
                             url =
-                                'https://ufund.comseven.com/Runtime/Runtime/Form/Form.GuarantorAuthen/?QUATATION_ID=' +
+                                env_K2_url + '/Runtime/Runtime/Form/Form.GuarantorAuthen/?QUATATION_ID=' +
                                 response.data['Guarantor'].QUOTATION_ID + '&PST_GUAR_ID=' + response.data[
                                     'Guarantor'].PST_GUAR_ID
                         }
@@ -427,16 +442,17 @@
                     if (response.data['CONTRACT']) {
                         if (response.data['CONTRACT'][0].STATUS_ID) {
 
-                            $('#div_guar').addClass('d-none');
-                            $('#div_contract_status').removeClass('d-none')
-
                             let cont_status = response.data['CONTRACT'][0].STATUS_ID;
                             if (cont_status == '53') {
+                                $('#div_guar').addClass('d-none');
+                                $('#div_contract_status').removeClass('d-none')
                                 $('#txt_header_contract_status').text(
                                     'UFUND ได้ปิดสัญญาล่วงหน้าให้คุณเรียบร้อยแล้ว')
                             } else if (cont_status == '40') {
                                 $('#txt_header_contract_status').text(
                                     'UFUND ได้ปิดสัญญาให้คุณเรียบร้อยแล้ว')
+                                $('#div_guar').addClass('d-none');
+                                $('#div_contract_status').removeClass('d-none')
                             }
                         }
                     }
@@ -637,7 +653,7 @@
                         openDoc(response.data.PDF_APP[0]['PDF_NAME'])
                     } else if (response.data.URL_APP) {
                         window.open(
-                            'https://ufund.comseven.com/Runtime/Runtime/Form/Preview+Application/?APP_ID=' +
+                            env_K2_url + '/Runtime/Runtime/Form/Preview+Application/?APP_ID=' +
                             response.data.URL_APP['APP_ID'] + '&PERSION_ID=' + response.data
                             .URL_APP['PERSION_ID'] + '&PROD_ID=' + response.data.URL_APP[
                                 'PROD_ID'])

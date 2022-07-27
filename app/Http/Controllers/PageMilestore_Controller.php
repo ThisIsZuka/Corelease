@@ -139,7 +139,7 @@ class PageMilestore_Controller extends BaseController
             // dd($return_data->Guarantor);
 
 
-            if (isset($data['Qid'])) {
+            if (isset($data['Qid'])) {    
                 // wait approve
                 $QT_status27 = DB::table('dbo.QUOTATION')
                     ->select('QUOTATION_ID', 'CUSTOMER_NAME', 'STATUS_ID')
@@ -198,7 +198,6 @@ class PageMilestore_Controller extends BaseController
                     ->get();
                 $return_data->Company = $Company[0]->BRANCH_SHORT_NAME;
 
-
                 // GET_QR_Code
                 if ($check != 0) {
                     $SMS_REPAY_Down = DB::table('dbo.TTP_SMS_RESULT')
@@ -208,6 +207,7 @@ class PageMilestore_Controller extends BaseController
                         ->get();
                     // dd($SMS_REPAY_Down);
                     $check_SMS_REPAY_Down = count($SMS_REPAY_Down);
+                    
                     if ($check_SMS_REPAY_Down != 0) {
                         $Status_Pay_Down = DB::table('dbo.REPAYMENT')
                             ->select('*')

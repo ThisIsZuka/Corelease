@@ -1,0 +1,1 @@
+<img src="{{ asset('images/UFUND.png') }}" alt="" style="width: 30%; cursor: pointer;" id="icon_ufond" onclick="window.location = '{{ url('/') }}'">

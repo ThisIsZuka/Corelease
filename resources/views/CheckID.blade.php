@@ -37,15 +37,34 @@
     <link rel="stylesheet" href="{{ asset('css/header.css') }}">
     <link rel="stylesheet" href="{{ asset('css/CheckID.css') }}">
 
+    {{-- Google Analytics --}}
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-SCHXYFRTK1"></script>
+
+
+    <style>
+        @media only screen and (max-width: 600px) {
+            .resolution-show-cate {
+                display: none;
+            }
+        }
+
+    </style>
+
 </head>
 
 <body>
 
     <div class="container mt-3">
 
-        <div class="loading" style="display: none">Loading&#8230;</div>
+        {{-- <div class="loading" style="display: none">Loading&#8230;</div> --}}
+        <div class="loading" style="display: none">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
 
-        @include('templates.alert_noti')
+        {{-- @include('templates.alert_noti') --}}
 
         <form class="centered">
 
@@ -76,14 +95,56 @@
             </div>
         </form>
 
-    </div>
 
+        <!-- Modal Multi APP_ID-->
+        {{-- <div class="modal fade" id="Multi_APP_ID_Modal" tabindex="-1" aria-labelledby="Multi_APP_ID_Modal" aria-hidden="true"> --}}
+        <div class="modal fade" id="Multi_APP_ID_Modal" tabindex="-1" aria-labelledby="exampleModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg justify-content-center">
+                <div class="modal-content border-0" style="background-color: #fff0;">
+                    <div class="row h-100" id="list_APP_ID">
+
+                        {{-- <div class="col-12 d-flex justify-content-center mt-2">
+                        <div class="card" style="max-width: 600px;">
+                            <div class="row g-0">
+                                <div class="col-md-4 text-center">
+                                    <img src="{{ asset('images/Category/Ipad.png') }}" class="img-fluid rounded-start" style="width: 10rem;">
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Card title</h5>
+                                        <p class="card-text">This is a wider card with supporting text below as a
+                                            natural lead-in to additional content. This content is a little bit longer.
+                                        </p>
+                                        <p class="card-text"><small class="text-muted">Last updated 3 mins
+                                                ago</small></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div> --}}
+                    </div>
+                </div>
+            </div>
+        </div>
 
 </body>
 
 </html>
 <script>
     $(document).ready(function() {
+
+
+        // Google Analytics
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+
+        gtag('config', 'G-SCHXYFRTK1');
+
 
         Cookies.remove('APP_ID');
         Cookies.remove('CUSTOMER_NAME');
@@ -363,7 +424,7 @@
 
 
         $('#btn_submit').click(function() {
-            $(".loading").css("display", "block");
+            // $(".loading").css("display", "block");
             // var id_card = $('#id_card').val().replace(/[^0-9 ]/g, "");
             axios({
                     method: 'POST',
@@ -395,15 +456,21 @@
                             text: 'ไม่พบข้อมูลในระบบ'
                         });
                         $(".loading").css("display", "none");
+                    } else if (response.data[0].APP_ID) {
+                        if (response.data.length > 1) {
+                            // var booleanValue = listOfObjecs.filter((item) =>  item.STATUS_ID != '4')
+                            // console.log(booleanValue);
+                            choice_APP_ID(response.data);
+                        } else {
+                            Cookies.set('APP_ID', response.data[0].APP_ID);
+                            Cookies.set('CUSTOMER_NAME', response.data[0].CUSTOMER_NAME);
+                            Cookies.set('QUOTATION_ID', response.data[0].QUOTATION_ID);
+                            // log_login(response.data)
+                            window.location = '{{ url('/Milestone') }}';
+                        }
                     } else if (response.data[0].QUOTATION_ID) {
                         Cookies.set('QUOTATION_ID', response.data[0].QUOTATION_ID);
                         Cookies.set('CUSTOMER_NAME', response.data[0].CUSTOMER_NAME);
-                        // log_login(response.data)
-                        window.location = '{{ url('/Milestone') }}';
-                    } else if (response.data[0].APP_ID) {
-                        Cookies.set('APP_ID', response.data[0].APP_ID);
-                        Cookies.set('CUSTOMER_NAME', response.data[0].FIRST_NAME + ' ' + response
-                            .data[0].LAST_NAME);
                         // log_login(response.data)
                         window.location = '{{ url('/Milestone') }}';
                     } else {
@@ -428,10 +495,58 @@
                         width: 'auto',
                         text: 'SYSTEM ERROR'
                     });
-                    // $(".loading").css("display", "none");
+                    $(".loading").css("display", "none");
                     console.log(error);
                 });
         });
+
+        const choice_APP_ID = (data) => {
+            $(".loading").css("display", "none");
+            console.log(data)
+            let html = '';
+            // {{ asset('images/Category/${data[i].product.CATEGORY_NAME}.png') }}
+            for (let i = 0; i < data.length; i++) {
+                // alert(data[i].product.CATEGORY_NAME);
+                const myJSON = JSON.stringify(data[i]);
+                html += `
+                    <div class="col-12 justify-content-center mt-2">
+                        <div class="card">
+                            <div class="row g-0">
+                                <div class="col-sm-2 col-md-4 text-center resolution-show-cate">
+                                    <img src="{{ asset('images/Category/${data[i].product.CATEGORY_NAME}.png') }}" class="img-fluid rounded-start" style="width: 10rem;">
+                                </div>
+                                <div class="col-sm-8 col-md-8">
+                                    <div class="card border-0 h-100 justify-content-center">
+                                        <div>
+                                            <div class="card-body">
+                                                <h5 class="card-title">สัญญาที่ ${i + 1}</h5>
+                                                <h4 class="card-text">${data[i].product.SERIES_NAME}</h4>
+                                                <button type="button" value='${ myJSON }' id="btn_select_contract" class="btn btn-outline-success">ตรวจสอบ</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `
+            }
+            $('#list_APP_ID').html(html);
+            $('#Multi_APP_ID_Modal').modal('show');
+        }
+
+
+        $(document).on("click", "#btn_select_contract", function(e) {
+            e.preventDefault();
+            const obj = JSON.parse($(this).val());
+            // console.log(obj)
+            Cookies.set('APP_ID', obj.APP_ID);
+            Cookies.set('CUSTOMER_NAME', obj.CUSTOMER_NAME);
+            Cookies.set('QUOTATION_ID', obj.QUOTATION_ID);
+            // log_login(response.data)
+            window.location = '{{ url('/Milestone') }}';
+        })
+
 
         const log_login = async (data) => {
 

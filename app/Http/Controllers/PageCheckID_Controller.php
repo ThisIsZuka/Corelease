@@ -47,7 +47,7 @@ class PageCheckID_Controller extends BaseController
 
 
             $Check_Bdate_NoQUOTATION = DB::table('dbo.PERSON')
-                ->select('PERSON.APP_ID', 'BIRTHDAY', 'TAX_ID', 'FIRST_NAME', 'LAST_NAME')
+                ->select('PERSON.APP_ID', 'BIRTHDAY', 'TAX_ID', 'FIRST_NAME', 'LAST_NAME' , 'APPLICATION.QUOTATION_ID')
                 ->leftJoin('APPLICATION', 'PERSON.APP_ID', '=', 'APPLICATION.APP_ID')
                 ->where('TAX_ID', $data['id_card'])
                 ->where([
@@ -113,7 +113,7 @@ class PageCheckID_Controller extends BaseController
                                 // ])
                                 ->get();
                             // dd($PD);
-                            $num_Check_contract = 0;        
+                            $num_Check_contract = 0;
                             if (!$PD->isEmpty()) {
                                 $Check_contract = DB::table('dbo.CONTRACT')
                                     ->select('APP_ID', 'STATUS_ID')
@@ -130,9 +130,9 @@ class PageCheckID_Controller extends BaseController
                                 $num_Check_contract = count($Check_contract);
                             }
                             // dd($num_Check_contract);
-                            
+
                             if (!$PD->isEmpty()  && $PD[0]->CHECKER_RESULT != 'Reject') {
-                                if($num_Check_contract == 0){
+                                if ($num_Check_contract == 0) {
                                     array_push($CK_APP, ['APP_ID' => $PD[0]->APP_ID, 'CHECKER_RESULT' => $PD[0]->CHECKER_RESULT]);
                                 }
                             }
@@ -160,8 +160,9 @@ class PageCheckID_Controller extends BaseController
                                     array_push($CK_Reject, $CK_APP[$i]['APP_ID']);
                                 }
                             }
-
+                            // dd($CK_Approve);
                             if (count($CK_Approve) > 0) {
+                                $ALL_APP = [];
                                 for ($i = 0; $i < count($CK_Approve); $i++) {
                                     $PD_Approve = DB::table('dbo.APPLICATION')
                                         ->select('APPLICATION.APP_ID', 'APPLICATION.QUOTATION_ID', 'APPLICATION.CUSTOMER_NAME', 'CONTRACT.STATUS_ID')
@@ -173,12 +174,42 @@ class PageCheckID_Controller extends BaseController
                                         // $return_data = $PD_Approve;
                                         // dd($PD_Approve[0]->APP_ID);
                                         $PD = DB::table('dbo.APPLICATION')
-                                            ->select('APP_ID', 'QUOTATION_ID', 'CUSTOMER_NAME', 'CHECKER_RESULT')
+                                            ->select('APP_ID', 'QUOTATION_ID', 'CUSTOMER_NAME', 'CHECKER_RESULT', 'STATUS_ID')
                                             ->where('APP_ID', $PD_Approve[0]->APP_ID)
                                             ->get();
-                                        $return_data = $PD;
+
+                                        // Get Product
+                                        $product_KYC = DB::table('dbo.PRODUCT')
+                                            ->select('CATEGORY_NAME', 'MT_BRAND.BRAND_NAME', 'SERIES_NAME')
+                                            ->leftJoin('MT_CATEGORY', 'PRODUCT_CATEGORY', '=', 'MT_CATEGORY.CATEGORY_ID')
+                                            ->leftJoin('MT_BRAND', 'PRODUCT_BAND', '=', 'MT_BRAND.BRAND_ID')
+                                            ->leftJoin('MT_SERIES', 'PRODUCT_SERIES', '=', 'MT_SERIES.SERIES_ID')
+                                            ->where('QUOTATION_ID', $PD_Approve[0]->QUOTATION_ID)
+                                            ->orderBy('APP_ID', 'DESC')
+                                            ->get();
+
+                                        $product_Regis = DB::table('dbo.QUOTATION')
+                                            ->select('CATEGORY_NAME', 'MT_BRAND.BRAND_NAME', 'SERIES_NAME')
+                                            ->leftJoin('MT_CATEGORY', 'PRODUCT_CATEGORY', '=', 'MT_CATEGORY.CATEGORY_ID')
+                                            ->leftJoin('MT_BRAND', 'PRODUCT_BAND', '=', 'MT_BRAND.BRAND_ID')
+                                            ->leftJoin('MT_SERIES', 'PRODUCT_SERIES', '=', 'MT_SERIES.SERIES_ID')
+                                            ->where('QUOTATION_ID', $PD_Approve[0]->QUOTATION_ID)
+                                            ->get();
+
+                                        $num_product_KYC = count($product_KYC);
+                                        if ($num_product_KYC != 0) {
+                                            $product = $product_KYC[0];
+                                        } else {
+                                            $product = $product_Regis[0];
+                                        }
+                                        $PD[0]->product = $product;
+
+                                        array_push($ALL_APP, $PD[0]);
+                                        // $return_data = $PD;
                                     }
                                 }
+                                $return_data = $ALL_APP;
+                                // dd($return_data);
                             } else if (count($CK_Rework) > 0) {
                                 $PD = DB::table('dbo.APPLICATION')
                                     ->select('APP_ID', 'QUOTATION_ID', 'CUSTOMER_NAME', 'CHECKER_RESULT')
@@ -226,8 +257,8 @@ class PageCheckID_Controller extends BaseController
                 return 'NoData';
             }
         } catch (Exception $e) {
-            // return response()->json(array('message' => $e->getMessage()));
-            return response()->json(array('message' => 'ERROR'));
+            return response()->json(array('message' => $e->getMessage()));
+            // return response()->json(array('message' => 'ERROR'));
         }
     }
 }
