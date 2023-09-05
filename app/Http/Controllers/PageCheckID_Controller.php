@@ -85,7 +85,7 @@ class PageCheckID_Controller extends BaseController
                         $CK_APP = [];
                         for ($i = 0; $i < $num; $i++) {
                             $PD = DB::table('dbo.APPLICATION')
-                                ->select('APPLICATION.APP_ID', 'APPLICATION.QUOTATION_ID', 'APPLICATION.CUSTOMER_NAME', 'APPLICATION.CHECKER_RESULT', 'APPLICATION.STATUS_ID', 'CONTRACT.STATUS_ID')
+                                ->select('APPLICATION.APP_ID', 'APPLICATION.QUOTATION_ID', 'APPLICATION.CUSTOMER_NAME', 'APPLICATION.CHECKER_RESULT', 'APPLICATION.STATUS_ID AS APPLICATION_STATUS_ID', 'CONTRACT.STATUS_ID')
                                 ->leftJoin('CONTRACT', 'APPLICATION.APP_ID', '=', 'CONTRACT.APP_ID')
                                 ->where('QUOTATION_ID', $CS[$i]->QUOTATION_ID)
                                 ->where([
@@ -247,6 +247,7 @@ class PageCheckID_Controller extends BaseController
                 $DataBdate = $Check_Bdate_NoQUOTATION[0]->BIRTHDAY;
                 $str_BDATE = $this->SubSRT($DataBdate);
                 // dd($str_BDATE.'=='. $data['b_date']);
+                // dd($Check_Bdate_NoQUOTATION);
                 if ($str_BDATE == $data['b_date']) {
                     $return_data =  $Check_Bdate_NoQUOTATION;
                     return $return_data;
@@ -257,8 +258,8 @@ class PageCheckID_Controller extends BaseController
                 return 'NoData';
             }
         } catch (Exception $e) {
-            return response()->json(array('message' => $e->getMessage()));
-            // return response()->json(array('message' => 'ERROR'));
+            // return response()->json(array('message' => $e->getMessage()));
+            return response()->json(array('message' => 'ERROR'));
         }
     }
 }

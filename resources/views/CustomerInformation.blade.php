@@ -91,6 +91,9 @@
                                     <h6>คลิกเพื่อสแกนชำระเงิน</h6>
                                     <img id="img_qrcode" src="{{ asset('images/QR_Code.png') }}"
                                         style="width: 8rem; border: 2px solid red;" class="mb-1">
+                                    <div class="d-none" id="qr_code_alert_notfound">
+                                        <p style="font-size: 0.8rem; color:red;">ขออภัยในความไม่สะดวก ระบบกำลังดำเนินการประมวลผล QR Code ชำระเงินงวดล่าสุดของท่าน กรุณาตรวจสอบอีกครั้งในวันที่ 5 และ 20 ของเดือนเป็นต้นไป</p>
+                                    </div>
                                     <p id="QR_price"> </p>
                                 </a>
                             </div>
@@ -154,6 +157,13 @@
                                 PDF ใบรับสิทธิประโยชน์การประกันภัย
                             </div>
                         </div>
+                        {{-- -----------------------------------------
+                        <br>
+                        <div class="row mt-2 mb-2">
+                            <div class="text-center">
+                                <a href="{{ asset('/วิธีการชำระเงินค่างวดเช่าซื้อ.pdf') }}" target="_blank"> วิธีการชำระเงินค่างวดเช่าซื้อ กรณี QR Code ไม่แสดง </a>
+                            </div>
+                        </div> --}}
                     </div>
                 </div>
 
@@ -401,6 +411,7 @@
                     var count_sum = 0
                     var text_data_late = '';
                     var REF_NO_data = null;
+                    var CONTRACT_NUMBER = response.data.CONTRACT[0]['CONTRACT_NUMBER']
 
                     for (let i = 0; i < Customer_card.length; i++) {
 
@@ -429,7 +440,9 @@
                         }
 
                         if (card_month == now_month && now_year == card_year) {
-                            if ((now_day + 3) > card_day) {
+                            let now_day_add = parseInt(now_day);
+                            let int_card_day = parseInt(card_day);
+                            if ( now_day_add > int_card_day) {
                                 if (Customer_card[i].RECEIPT_NUMBER == null) {
                                     text_data_late += result;
                                     // $('#alertDate').text('[* ค่างวดของท่านประจำวันที่ ' + result +
@@ -483,22 +496,24 @@
                             `
                     }
 
-                    if (REF_NO_data != null && REF_NO_data != 1) {
-                        GET_QR_Code(REF_NO_data)
-                    }
 
-                    txtalert = '[* ค่างวดของท่านประจำวันที่ ' + text_data_late +
-                        ' เกินกำหนดชำระ กรุณาชำระตามบิลเรียกเก็บ <br> และขออภัย หากท่านชำระเรียบร้อยแล้ว กรุณารอรับใบเสร็จ ภายใน 7วันทำการ ]'
+                    txtalert = `[* ค่างวดของท่านประจำวันที่ ${text_data_late} เกินกำหนดชำระ กรุณาชำระตามบิลเรียกเก็บ <br> และขออภัย หากท่านชำระเรียบร้อยแล้ว กรุณารอรับใบเสร็จ ภายใน 7วันทำการ ]`
                     $('#alertDate').html(txtalert)
                     $('#Tbody').html(html);
                     // $('#Count_repay').text('ยอดเงินค่าเช่าซื้อคงเหลือ ' + formatter.format(count_sum))
                     if(response.data.CONTRACT[0].STATUS_ID == "53" || response.data.CONTRACT[0].STATUS_ID == "40"){
                         $('#Count_repay').text('ยอดเงินค่าเช่าซื้อคงเหลือ 0 บาท')
                     }else{
-                        $('#Count_repay').text('ยอดเงินค่าเช่าซื้อคงเหลือ ' + numberWithCommas(parseFloat(count_sum).toFixed(2)) + ' บาท')
+                        $('#Count_repay').text(`ยอดเงินค่าเช่าซื้อคงเหลือ ${numberWithCommas(parseFloat(count_sum).toFixed(2))} บาท`)
                     }
 
-                    $(".loading").css("display", "none");
+                    if (REF_NO_data != null && REF_NO_data != 1) {
+                        GET_QR_Code(REF_NO_data, CONTRACT_NUMBER)
+                    }else{
+                        $(".loading").css("display", "none");
+                    }
+
+                    // 
 
                 })
                 .catch(function(error) {
@@ -510,7 +525,7 @@
         }
 
         // Get QR_Code
-        function GET_QR_Code(REF_NO_data) {
+        function GET_QR_Code(REF_NO_data, CONTRACT_NUMBER) {
             $(".loading").css("display", "block");
             clearTimeout(initial)
             invocation();
@@ -519,11 +534,12 @@
                     url: 'QR_Code',
                     data: {
                         Ref_NO: REF_NO_data,
+                        CONTRACT_NUMBER: CONTRACT_NUMBER,
                     },
                 }).then(function(response) {
                     var data_QR_Code = response.data.QR_Code
-                    // var regex = /<img.*?src='(.*?)'/;
-                    // var src = regex.exec(data_QR_Code.QRCODE_FILE);
+                    var regex = /<img.*?src='(.*?)'/;
+                    var src = regex.exec(data_QR_Code.QRCODE_FILE);
                     // console.log(src);
                     var elem = document.createElement("div");
                     elem.innerHTML = data_QR_Code.QRCODE_FILE;
@@ -534,10 +550,16 @@
                         link_QR = images[i].src;
                         // console.log(images[i].src);
                     }
+                    // console.log(link_QR);
+                    if(link_QR == null){
+                        $('#qr_code_alert_notfound').removeClass('d-none');
+                    }
+
                     $('#href_QR').attr("href", link_QR);
                     $('#href_QR').attr('target', '_blank');
 
                     $('#img_qrcode').attr("src", link_QR);
+                    // $('#img_qrcode').attr("src", "data:image/jpeg;base64," + response.data.base64_qrcode);
 
                     var QR_amt = (data_QR_Code.INV_AMT.length) - 2;
                     var qr_int = '';
@@ -630,9 +652,18 @@
 
                 })
                 .catch(function(error) {
+                    Snackbar.show({
+                            actionText: 'close',
+                            pos: 'top-center',
+                            duration: 15000,
+                            actionTextColor: '#dc3545',
+                            backgroundColor: '#323232',
+                            width: 'auto',
+                            text: 'เกิดข้อผิดพลาด กรุณาลองอีกครั้ง'
+                        });
                     // console.log(error);
                     setTimeout(function() {
-                        // location.reload();
+                        location.reload();
                     }, 5000);
                 });
         }
@@ -763,47 +794,33 @@
 
             let list_url = [{
                     type: 'CONTRACT',
-                    url: env_K2_url + '/Runtime/Runtime/Form/EditContract+HirePurhcase/?APP_ID=' +
-                        data.APP_ID + '&PERSION_ID=' + data.PERSION_ID + '&PROD_ID=' + data.PROD_ID +
-                        '&CONTRACT_ID=' + data.CONTRACT_ID
+                    url: `${env_K2_url}/Runtime/Runtime/Form/EditContract+HirePurhcase/?APP_ID=${data.APP_ID}&PERSION_ID=${data.PERSION_ID}&PROD_ID=${data.PROD_ID}&CONTRACT_ID=${data.CONTRACT_ID}`
                 },
                 {
                     type: 'RPDOWN',
-                    url: env_K2_url + '/Runtime/Runtime/Form/ReGen__Preview+Receipt+Payment/?_state=GenReceiptDownAmount&CONTRACT_ID=&ID=' +
-                        data.CONTRACT_ID + '&REPAY_ID=' + data.REPAY_ID + '&PROD_ID=' + data.PROD_ID +
-                        '&PERSON_ID=' + data.PERSON_ID + '&APP_ID=' + data.APP_ID
+                    url: `${env_K2_url}/Runtime/Runtime/Form/ReGen__Preview+Receipt+Payment/?_state=GenReceiptDownAmount&CONTRACT_ID=&ID=${data.CONTRACT_ID}&REPAY_ID=${data.REPAY_ID}&PROD_ID=${data.PROD_ID}&PERSON_ID=${data.PERSON_ID}&APP_ID=${data.APP_ID}`
                 },
                 {
                     type: 'TPDOWN',
-                    url: env_K2_url + '/Runtime/Runtime/Form/ReGen__Preview+TAX+Repayment/?_state=GenPDF_TaxDown&CONTRACT_ID=&ID=' +
-                        data.CONTRACT_ID + '&REPAY_ID=' + data.REPAY_ID + '&PROD_ID=' + data.PROD_ID +
-                        '&PERSON_ID=' + data.PERSON_ID + '&APP_ID=' + data.APP_ID
+                    url: `${env_K2_url}/Runtime/Runtime/Form/ReGen__Preview+TAX+Repayment/?_state=GenPDF_TaxDown&CONTRACT_ID=&ID=${data.CONTRACT_ID}&REPAY_ID=${data.REPAY_ID}&PROD_ID=${data.PROD_ID}&PERSON_ID=${data.PERSON_ID}&APP_ID=${data.APP_ID}`
                 },
                 {
                     type: 'TBDOWN',
-                    url: env_K2_url + '/Runtime/Runtime/Form/Re-GenTableCalculate/?CONTRACT_ID=' +
-                        data.CONTRACT_ID + '&APP_ID=' + data.APP_ID + '&PERSON_ID=' + data.PERSION_ID
+                    url: `${env_K2_url}/Runtime/Runtime/Form/Re-GenTableCalculate/?CONTRACT_ID=${data.CONTRACT_ID}&APP_ID=${data.APP_ID}&PERSON_ID=${data.PERSION_ID}`
                 },
                 {
                     type: 'INVOICE',
                     // url: env_K2_url + '/Runtime/Runtime/Form/PreviewInvoiceAsof020820/?CONTRACT_ID=' +
                     //     data.CONTRACT_ID + '&ID=' + data.ID + '&INVOICE_ID=' + data.INVOICE_ID,
-                    url: env_K2_url + '/Runtime/Runtime/Form/PreviewInvoiceAsof020820__ReadOnly/?CONTRACT_ID=' +
-                        data.CONTRACT_ID + '&ID=' + data.ID + '&INVOICE_ID=' + data.INVOICE_ID,
+                    url: `${env_K2_url}/Runtime/Runtime/Form/PreviewInvoiceAsof020820__ReadOnly/?CONTRACT_ID=${data.CONTRACT_ID}&ID=${data.ID}&INVOICE_ID=${data.INVOICE_ID}`
                 },
                 {
                     type: 'REPAY',
-                    url: env_K2_url + '/Runtime/Runtime/Form/ReGen__Preview+Receipt+Payment/?_state=GenManualReceipt&CONTRACT_ID=' +
-                        data.CONTRACT_ID + '&ID=' + data.ID + '&REPAY_ID=' + data.REPAY_ID +
-                        '&PROD_ID=' + data.PROD_ID + '&PERSON_ID=' + data.PERSION_ID +
-                        '&APP_ID=' + data.APP_ID
+                    url: `${env_K2_url}/Runtime/Runtime/Form/ReGen__Preview+Receipt+Payment/?_state=GenManualReceipt&CONTRACT_ID=${data.CONTRACT_ID}&ID=${data.ID}&REPAY_ID=${data.REPAY_ID}&PROD_ID=${data.PROD_ID}&PERSON_ID=${data.PERSION_ID}&APP_ID=${data.APP_ID}`
                 },
                 {
                     type: 'TAX_INVOICE',
-                    url: env_K2_url + '/Runtime/Runtime/Form/ReGen__Preview+TAX+Repayment/?_state=GenPDF&CONTRACT_ID=' +
-                        data.CONTRACT_ID + '&ID=' + data.ID + '&REPAY_ID=' + data.REPAY_ID +
-                        '&PROD_ID=' + data.PROD_ID + '&PERSON_ID=' + data.PERSION_ID +
-                        '&APP_ID=' + data.APP_ID
+                    url: `${env_K2_url}/Runtime/Runtime/Form/ReGen__Preview+TAX+Repayment/?_state=GenPDF&CONTRACT_ID=${data.CONTRACT_ID}&ID=${data.ID}&REPAY_ID=${data.REPAY_ID}&PROD_ID=${data.PROD_ID}&PERSON_ID=${data.PERSION_ID}&APP_ID=${data.APP_ID}`
                 }
             ]
 

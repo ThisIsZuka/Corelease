@@ -47,7 +47,6 @@
                 display: none;
             }
         }
-
     </style>
 
 </head>
@@ -79,7 +78,8 @@
             </div> --}}
 
             <div class="mb-3">
-                <label for="id_card" class="form-label collectes-ville text-center"> กรุณากรอกเลขที่บัตรประชาชน </label>
+                <label for="id_card" class="form-label collectes-ville text-center"> กรุณากรอกเลขที่บัตรประชาชน
+                </label>
                 <input type="tel" class="form-control" id="id_card" aria-describedby="idHelp"
                     placeholder="เลขที่บัตรประชาชน" maxlength="13">
             </div>
@@ -424,7 +424,7 @@
 
 
         $('#btn_submit').click(function() {
-            // $(".loading").css("display", "block");
+            $(".loading").css("display", "block");
             // var id_card = $('#id_card').val().replace(/[^0-9 ]/g, "");
             axios({
                     method: 'POST',
@@ -463,7 +463,12 @@
                             choice_APP_ID(response.data);
                         } else {
                             Cookies.set('APP_ID', response.data[0].APP_ID);
-                            Cookies.set('CUSTOMER_NAME', response.data[0].CUSTOMER_NAME);
+                            // Cookies.set('CUSTOMER_NAME', response.data[0].CUSTOMER_NAME);
+                            if (response.data[0].CUSTOMER_NAME) {
+                                Cookies.set('CUSTOMER_NAME', response.data[0].CUSTOMER_NAME);
+                            } else if (response.data[0].FIRST_NAME) {
+                                Cookies.set('CUSTOMER_NAME', response.data[0].FIRST_NAME + ' ' + response.data[0].LAST_NAME);
+                            }
                             Cookies.set('QUOTATION_ID', response.data[0].QUOTATION_ID);
                             // log_login(response.data)
                             window.location = '{{ url('/Milestone') }}';

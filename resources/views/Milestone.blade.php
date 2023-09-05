@@ -192,9 +192,9 @@
                 <div class="d-none" id="div_contract_status">
                     <hr style="color: red;">
                     <p class="mt-3 text-center" style="color: red;" id="txt_header_contract_status"></p>
-                    ภายใน 7 วันจะมีเจ้าหน้าที่ติดต่อเพื่อแจ้งรายละเอียดการนำโปรไฟล์ควบคุมออก กรุณารอรับสายเจ้าหน้าที่
-                    หรือ สอบถามเพื่มเติมที่ <span style="">@Line</span> : <span
-                        style="color:#25e425">@ufund</span>
+                    <div class="">
+                        ภายใน 7 วันทำการ คุณจะได้รับข้อความ (SMS)จากเจ้าหน้าที่ แจ้งยืนยันการปิดสัญญา  กรุณาติดต่อนัดหมาย หรือสอบถาม วิธีการนำโปรแกรมควบคุมออกที่ <span style="">@Line</span>:<span style="color:#25e425">@ufund</span>    
+                    </div> 
                 </div>
 
             </div>
@@ -368,69 +368,79 @@
 
 
                     /////////////////////////// Guarantor /////////////////////////////////////////////////
-                    if (response.data['Guarantor'].count == 1) {
+                    if (response.data['Guarantor']) {
+                        if (response.data['Guarantor'].count == 1) {
 
-                        $('#div_url_guar').removeClass('d-none');
+                            $('#div_url_guar').removeClass('d-none');
 
-                        let url = null;
+                            let url = null;
 
-                        if (response.data['Guarantor'].QT_NOTPASS == 1) {
-                            url = env_K2_url + '/Runtime/Runtime/Form/Form.GuarantorPreInfo/?PST_GUAR_ID=' +
-                                response.data['Guarantor'].PST_GUAR_ID + '&STATE=CHANGEQUO'
-                        } else {
-                            url =
-                                env_K2_url + '/Runtime/Runtime/Form/Form.GuarantorAuthen/?QUATATION_ID=' +
-                                response.data['Guarantor'].QUOTATION_ID + '&PST_GUAR_ID=' + response.data[
-                                    'Guarantor'].PST_GUAR_ID
+                            if (response.data['Guarantor'].QT_NOTPASS == 1) {
+                                url = env_K2_url +
+                                    '/Runtime/Runtime/Form/Form.GuarantorPreInfo/?PST_GUAR_ID=' +
+                                    response.data['Guarantor'].PST_GUAR_ID + '&STATE=CHANGEQUO'
+                            } else {
+                                url =
+                                    env_K2_url +
+                                    '/Runtime/Runtime/Form/Form.GuarantorAuthen/?QUATATION_ID=' +
+                                    response.data['Guarantor'].QUOTATION_ID + '&PST_GUAR_ID=' + response
+                                    .data[
+                                        'Guarantor'].PST_GUAR_ID
+                            }
+
+                            if (response.data['Guarantor'].url_accept_guarantor == 1) {
+                                url =
+                                    env_K2_url +
+                                    '/Runtime/Runtime/Form/Form.GuarantorAuthen/?QUATATION_ID=' +
+                                    response.data['Guarantor'].QUOTATION_ID + '&PST_GUAR_ID=' + response
+                                    .data[
+                                        'Guarantor'].PST_GUAR_ID
+                            }
+
+                            $('#url_guar').html('<a href="' + url + '" target="blank"> ' + url + ' </a>');
                         }
 
-                        if (response.data['Guarantor'].url_accept_guarantor == 1) {
-                            url =
-                                env_K2_url + '/Runtime/Runtime/Form/Form.GuarantorAuthen/?QUATATION_ID=' +
-                                response.data['Guarantor'].QUOTATION_ID + '&PST_GUAR_ID=' + response.data[
-                                    'Guarantor'].PST_GUAR_ID
-                        }
+                        if (response.data['Guarantor'].Guarantor_Result) {
 
-                        $('#url_guar').html('<a href="' + url + '" target="blank"> ' + url + ' </a>');
-                    }
+                            $('#div_guar').removeClass('d-none');
 
-                    if (response.data['Guarantor'].Guarantor_Result) {
+                            if (response.data['Guarantor'].Guarantor_Result['FLAG_GUARANTOR'] == 1) {
 
-                        $('#div_guar').removeClass('d-none');
+                                $('#Gurantor_ACTIVE').html(
+                                    '<span class="text-success">มีผู้ค้ำประกัน</span>')
 
-                        if (response.data['Guarantor'].Guarantor_Result['FLAG_GUARANTOR'] == 1) {
+                                $txt_Gurantor_ACCEPT = response.data['Guarantor'].Guarantor_Result[
+                                    'ACCEPT_STATUS'];
+                                $txt_Gurantor_RESULT = response.data['Guarantor'].Guarantor_Result[
+                                    'RESULT_GUARANTOR'];
 
-                            $('#Gurantor_ACTIVE').html('<span class="text-success">มีผู้ค้ำประกัน</span>')
-
-                            $txt_Gurantor_ACCEPT = response.data['Guarantor'].Guarantor_Result[
-                                'ACCEPT_STATUS'];
-                            $txt_Gurantor_RESULT = response.data['Guarantor'].Guarantor_Result[
-                                'RESULT_GUARANTOR'];
-
-                            $RESULT_obj = [{
-                                    id: 'WAIT',
-                                    color: 'text-warning',
-                                },
-                                {
-                                    id: 'PASS',
-                                    color: 'text-success',
-                                },
-                                {
-                                    id: 'NOTPASS',
-                                    color: 'text-danger',
-                                },
-                            ]
-                            // console.log($RESULT_obj.filter(x => x.id == $txt_Gurantor_RESULT)[0].color)
-                            $('#Gurantor_ACCEPT').html($txt_Gurantor_ACCEPT == 1 ?
-                                '<span class="text-success">ยินยอม</span>' : ($txt_Gurantor_ACCEPT ==
-                                    0 ? '<span class="text-danger">ไม่ยินยอม</span>' : '-'));
-                            $('#Gurantor_RESULT').html('<span class="' + $RESULT_obj.filter(x => x.id ==
-                                    $txt_Gurantor_RESULT)[0].color + '">' + $txt_Gurantor_RESULT +
-                                '</span>')
-                        } else {
-                            $('#Gurantor_ACTIVE').html('<span class="text-danger">ไม่มีผู้ค้ำประกัน</span>')
-                            $('#Gurantor_ACCEPT').text('-')
-                            $('#Gurantor_RESULT').text('-')
+                                $RESULT_obj = [{
+                                        id: 'WAIT',
+                                        color: 'text-warning',
+                                    },
+                                    {
+                                        id: 'PASS',
+                                        color: 'text-success',
+                                    },
+                                    {
+                                        id: 'NOTPASS',
+                                        color: 'text-danger',
+                                    },
+                                ]
+                                // console.log($RESULT_obj.filter(x => x.id == $txt_Gurantor_RESULT)[0].color)
+                                $('#Gurantor_ACCEPT').html($txt_Gurantor_ACCEPT == 1 ?
+                                    '<span class="text-success">ยินยอม</span>' : (
+                                        $txt_Gurantor_ACCEPT ==
+                                        0 ? '<span class="text-danger">ไม่ยินยอม</span>' : '-'));
+                                $('#Gurantor_RESULT').html('<span class="' + $RESULT_obj.filter(x => x.id ==
+                                        $txt_Gurantor_RESULT)[0].color + '">' + $txt_Gurantor_RESULT +
+                                    '</span>')
+                            } else {
+                                $('#Gurantor_ACTIVE').html(
+                                    '<span class="text-danger">ไม่มีผู้ค้ำประกัน</span>')
+                                $('#Gurantor_ACCEPT').text('-')
+                                $('#Gurantor_RESULT').text('-')
+                            }
                         }
                     }
                     /////////////////////////// End Guarantor /////////////////////////////////////////////////

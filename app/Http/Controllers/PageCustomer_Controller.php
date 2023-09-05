@@ -40,8 +40,8 @@ class PageCustomer_Controller extends BaseController
                 ->leftJoin('REPAYMENT', 'CUSTOMER_CARD.ID', '=', 'REPAYMENT.CUSTOMER_CARD_ID')
                 ->leftJoin('TAX_INVOICE', 'REPAYMENT.TAX_NUMBER', '=', 'TAX_INVOICE.TAX_NUMBER')
                 ->where('CUSTOMER_CARD.APPLICATION_NUMBER', $data['APP_ID'])
-                ->where(function($query){
-                    $query->where('REPAYMENT.REPAY_TYPE','2');
+                ->where(function ($query) {
+                    $query->where('REPAYMENT.REPAY_TYPE', '2');
                     $query->OrwhereNull('REPAYMENT.REPAY_TYPE');
                 })
                 ->orderBy('CUSTOMER_CARD.INSTALL_NUM', 'ASC')
@@ -128,7 +128,7 @@ class PageCustomer_Controller extends BaseController
                 ->where('INVOICE_ID', $data['PDF_ID'])
                 ->get();
             // dd($PDF);
-            if(count($PDF) != 0){
+            if (count($PDF) != 0) {
                 if ($PDF[0]->PDF_NAME != null) {
                     $return_data->PDF_Base64 = $PDF;
                 }
@@ -495,15 +495,32 @@ class PageCustomer_Controller extends BaseController
 
             $QR = DB::table('dbo.TTP_INV_BARCODE')
                 ->select('*')
-                ->where('INV_NO', $data['Ref_NO'])
+                // ->where('INV_NO', $data['Ref_NO'])
+                ->where('REF1_NO', $data['CONTRACT_NUMBER'])
                 ->orderBy('DUE_DATE', 'DESC')
                 ->get();
+
             $return_data->QR_Code = $QR[0];
+
+            foreach ($QR as $key => $val) {
+                preg_match("/http.*(jpg|png)/", $val->QRCODE_FILE, $matches);
+                // $url_img = $matches[0];
+                if(count($matches) != 0){
+                    $return_data->QR_Code = $QR[$key];
+                    break;
+                }
+            }
+
+            // preg_match("/http.*(jpg|png)/", $QR[0]->QRCODE_FILE, $matches);
+            // $url_img = $matches[0];
+            // $image_qrcode = file_get_contents($url_img);
+            // $base64_qrcode = base64_encode($image_qrcode);
+            // $return_data->base64_qrcode = $base64_qrcode;
 
             return $return_data;
         } catch (Exception $e) {
-            // return response()->json(array('message' => $e->getMessage()));
-            return response()->json(array('message' => 'ERROR'));
+            return response()->json(array('message' => $e->getMessage()));
+            // return response()->json(array('message' => 'ERROR'));
         }
     }
 
