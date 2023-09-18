@@ -374,8 +374,8 @@ class PageMilestore_Controller extends BaseController
                 return $return_data;
             }
         } catch (Exception $e) {
-            // return response()->json(array('message' => $e->getMessage()));
-            return response()->json(array('message' => 'ERROR'));
+            return response()->json(array('message' => $e->getMessage()));
+            // return response()->json(array('message' => 'ERROR'));
         }
     }
 
@@ -412,8 +412,8 @@ class PageMilestore_Controller extends BaseController
 
             return $return_data;
         } catch (Exception $e) {
-            // return response()->json(array('message' => $e->getMessage()));
-            return response()->json(array('message' => 'ERROR'));
+            return response()->json(array('message' => $e->getMessage()));
+            // return response()->json(array('message' => 'ERROR'));
         }
     }
 }

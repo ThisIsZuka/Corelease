@@ -119,6 +119,9 @@
                             <br>
                             ----------------------------------------
                         </div>
+                        <span style="color: red; font-size:0.9rem;">
+                            *สำหรับลูกค้า iPhone 15 series ทางพนักงานจะโทรแจ้งตามลำดับการสั่งซื้อเมื่อสินค้าพร้อมส่ง*
+                        </span>
                         <div id="DIV_QR_DOWN" style="display: none">
                             <div class="card" style="border-color: #ff0000;">
                                 <div class="card-body">
