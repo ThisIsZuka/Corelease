@@ -119,9 +119,6 @@
                             <br>
                             ----------------------------------------
                         </div>
-                        <span style="color: red; font-size:0.9rem;">
-                            *สำหรับลูกค้า iPhone 15 series ทางพนักงานจะโทรแจ้งตามลำดับการสั่งซื้อเมื่อสินค้าพร้อมส่ง*
-                        </span>
                         <div id="DIV_QR_DOWN" style="display: none">
                             <div class="card" style="border-color: #ff0000;">
                                 <div class="card-body">
@@ -155,6 +152,14 @@
                         <div id="list_etc_rework"></div>
                     </div>
                 </div>
+
+                <div>
+                    <span style="color: red; font-size:0.9rem;">
+                        *สำหรับลูกค้า iPhone 15 series สามารถรับสินค้าได้ทางร้านสาขาที่ลูกค้ายืนยันตัวตนเท่านั้น! 
+                        โดยทางพนักงานจะโทรแจ้งตามลำดับการสั่งซื้อเมื่อสินค้าพร้อมรับ*
+                    </span>
+                </div>
+
                 <div class="d-none" id="div_guar">
                     <hr>
                     <div class="d-none" id="div_url_guar">
