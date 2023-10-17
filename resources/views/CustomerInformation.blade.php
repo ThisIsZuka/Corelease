@@ -794,7 +794,7 @@
 
             let list_url = [{
                     type: 'CONTRACT',
-                    url: `${env_K2_url}/Runtime/Runtime/Form/EditContract+HirePurhcase/?APP_ID=${data.APP_ID}&PERSION_ID=${data.PERSION_ID}&PROD_ID=${data.PROD_ID}&CONTRACT_ID=${data.CONTRACT_ID}`
+                    url: `${env_K2_url}/Runtime/Runtime/Form/ReGenContractHPVer2/?_state=GenContract&APP_ID=${data.APP_ID}&PERSION_ID=${data.PERSION_ID}&PROD_ID=${data.PROD_ID}&CONTRACT_ID=${data.CONTRACT_ID}`
                 },
                 {
                     type: 'RPDOWN',
